@@ -1,0 +1,66 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+import "uuid.proto";
+import "media.proto";
+
+package grpc;
+
+option go_package = "./grpc";
+
+enum Status {
+  INACTIVE = 0;
+  ACTIVE = 1;
+  DRAFT = 2;
+}
+
+message Media {
+  repeated MediaItem Media = 1;
+}
+
+message New {
+  UUID Id = 1;
+  string Title= 2;
+  string Text = 3;
+  string ActivePeriod = 4;
+  optional Status Status = 5;
+  optional Media Media = 6;
+  optional google.protobuf.Timestamp CreatedAt = 7;
+  optional google.protobuf.Timestamp UpdatedAt = 8;
+  optional string Tags = 9;
+}
+
+message NewsList {
+  repeated New News = 1;
+}
+
+message ListStatusFilter {
+  repeated Status Status = 1;
+}
+
+message ListRequest {
+  optional int32 Sort = 1;
+  optional int32 Author = 2;
+  optional Status Status = 3;
+  optional string Query = 4;
+  optional int32 Page = 5;
+}
+
+message InfoRequest {
+  UUID Id = 1;
+}
+
+service News {
+  rpc List (ListRequest) returns (NewsList) {
+    option (google.api.http) = {
+      post: "/v1/list"
+      body: "*"
+    };
+  };
+  rpc Info (InfoRequest) returns (New) {};
+  rpc Create (New) returns (google.protobuf.Empty) {};
+  rpc Update (New) returns (google.protobuf.Empty) {};
+  rpc Delete (UUID) returns (google.protobuf.Empty) {};
+}

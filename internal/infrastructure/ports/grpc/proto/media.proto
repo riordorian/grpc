@@ -1,0 +1,19 @@
+syntax = "proto3";
+import "uuid.proto";
+
+package grpc;
+
+option go_package = "./grpc";
+
+enum MediaType {
+  IMAGE = 0;
+  VIDEO = 1;
+  DOCUMENT = 2;
+}
+
+message MediaItem {
+  UUID Id = 1;
+  string Name = 2;
+  string Path = 3;
+  MediaType Type = 4;
+}

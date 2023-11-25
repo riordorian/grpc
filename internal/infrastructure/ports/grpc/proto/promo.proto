@@ -1,0 +1,51 @@
+syntax = "proto3";
+
+package grpc;
+
+option go_package = "./grpc";
+import "uuid.proto";
+import "media.proto";
+import "google/protobuf/timestamp.proto";
+
+enum PromoStatus {
+  PROMO_INACTIVE = 0;
+  PROMO_ACTIVE = 1;
+  PROMO_DRAFT = 2;
+}
+
+message PromoMedia {
+  repeated MediaItem Media = 1;
+}
+
+message Promo {
+  UUID Id = 1;
+  string Title= 2;
+  string Text = 3;
+  string ActivePeriod = 4;
+  optional PromoStatus Status = 5;
+  optional PromoMedia Media = 6;
+  optional google.protobuf.Timestamp CreatedAt = 7;
+  optional google.protobuf.Timestamp UpdatedAt = 8;
+}
+
+message PromosList {
+  repeated Promo Promo = 1;
+}
+
+message PromoListRequest {
+  optional int32 Sort = 1;
+  optional int32 Author = 2;
+  optional PromoStatus Status = 3;
+  optional string Query = 4;
+  optional int32 Page = 5;
+}
+
+message PromoInfoRequest {
+  UUID Id = 1;
+}
+
+
+service Promos {
+  rpc PromoList (PromoListRequest) returns (PromosList) {};
+  rpc PromoInfo (PromoInfoRequest) returns (Promo) {};
+}

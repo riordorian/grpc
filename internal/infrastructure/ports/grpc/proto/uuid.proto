@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package grpc;
+
+option go_package = "./grpc";
+
+message UUID {
+  string Id = 1;
+}
