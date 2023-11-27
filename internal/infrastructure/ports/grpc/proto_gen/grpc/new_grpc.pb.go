@@ -20,22 +20,14 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	News_List_FullMethodName   = "/grpc.News/List"
-	News_Info_FullMethodName   = "/grpc.News/Info"
-	News_Create_FullMethodName = "/grpc.News/Create"
-	News_Update_FullMethodName = "/grpc.News/Update"
-	News_Delete_FullMethodName = "/grpc.News/Delete"
+	News_List_FullMethodName = "/grpc.News/List"
 )
 
 // NewsClient is the client API for News service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type NewsClient interface {
-	List(ctx context.Context, in *ListRequest, opts ...grpc.CallOption) (*NewsList, error)
-	Info(ctx context.Context, in *InfoRequest, opts ...grpc.CallOption) (*New, error)
-	Create(ctx context.Context, in *New, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	Update(ctx context.Context, in *New, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	Delete(ctx context.Context, in *UUID, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	List(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
 type newsClient struct {
@@ -46,45 +38,9 @@ func NewNewsClient(cc grpc.ClientConnInterface) NewsClient {
 	return &newsClient{cc}
 }
 
-func (c *newsClient) List(ctx context.Context, in *ListRequest, opts ...grpc.CallOption) (*NewsList, error) {
-	out := new(NewsList)
+func (c *newsClient) List(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
 	err := c.cc.Invoke(ctx, News_List_FullMethodName, in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *newsClient) Info(ctx context.Context, in *InfoRequest, opts ...grpc.CallOption) (*New, error) {
-	out := new(New)
-	err := c.cc.Invoke(ctx, News_Info_FullMethodName, in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *newsClient) Create(ctx context.Context, in *New, opts ...grpc.CallOption) (*emptypb.Empty, error) {
-	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, News_Create_FullMethodName, in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *newsClient) Update(ctx context.Context, in *New, opts ...grpc.CallOption) (*emptypb.Empty, error) {
-	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, News_Update_FullMethodName, in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *newsClient) Delete(ctx context.Context, in *UUID, opts ...grpc.CallOption) (*emptypb.Empty, error) {
-	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, News_Delete_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -95,11 +51,7 @@ func (c *newsClient) Delete(ctx context.Context, in *UUID, opts ...grpc.CallOpti
 // All implementations must embed UnimplementedNewsServer
 // for forward compatibility
 type NewsServer interface {
-	List(context.Context, *ListRequest) (*NewsList, error)
-	Info(context.Context, *InfoRequest) (*New, error)
-	Create(context.Context, *New) (*emptypb.Empty, error)
-	Update(context.Context, *New) (*emptypb.Empty, error)
-	Delete(context.Context, *UUID) (*emptypb.Empty, error)
+	List(context.Context, *emptypb.Empty) (*emptypb.Empty, error)
 	mustEmbedUnimplementedNewsServer()
 }
 
@@ -107,20 +59,8 @@ type NewsServer interface {
 type UnimplementedNewsServer struct {
 }
 
-func (UnimplementedNewsServer) List(context.Context, *ListRequest) (*NewsList, error) {
+func (UnimplementedNewsServer) List(context.Context, *emptypb.Empty) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method List not implemented")
-}
-func (UnimplementedNewsServer) Info(context.Context, *InfoRequest) (*New, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Info not implemented")
-}
-func (UnimplementedNewsServer) Create(context.Context, *New) (*emptypb.Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Create not implemented")
-}
-func (UnimplementedNewsServer) Update(context.Context, *New) (*emptypb.Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Update not implemented")
-}
-func (UnimplementedNewsServer) Delete(context.Context, *UUID) (*emptypb.Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Delete not implemented")
 }
 func (UnimplementedNewsServer) mustEmbedUnimplementedNewsServer() {}
 
@@ -136,7 +76,7 @@ func RegisterNewsServer(s grpc.ServiceRegistrar, srv NewsServer) {
 }
 
 func _News_List_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ListRequest)
+	in := new(emptypb.Empty)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -148,79 +88,7 @@ func _News_List_Handler(srv interface{}, ctx context.Context, dec func(interface
 		FullMethod: News_List_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(NewsServer).List(ctx, req.(*ListRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _News_Info_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(InfoRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(NewsServer).Info(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: News_Info_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(NewsServer).Info(ctx, req.(*InfoRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _News_Create_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(New)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(NewsServer).Create(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: News_Create_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(NewsServer).Create(ctx, req.(*New))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _News_Update_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(New)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(NewsServer).Update(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: News_Update_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(NewsServer).Update(ctx, req.(*New))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _News_Delete_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UUID)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(NewsServer).Delete(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: News_Delete_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(NewsServer).Delete(ctx, req.(*UUID))
+		return srv.(NewsServer).List(ctx, req.(*emptypb.Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -235,22 +103,6 @@ var News_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "List",
 			Handler:    _News_List_Handler,
-		},
-		{
-			MethodName: "Info",
-			Handler:    _News_Info_Handler,
-		},
-		{
-			MethodName: "Create",
-			Handler:    _News_Create_Handler,
-		},
-		{
-			MethodName: "Update",
-			Handler:    _News_Update_Handler,
-		},
-		{
-			MethodName: "Delete",
-			Handler:    _News_Delete_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

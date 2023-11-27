@@ -48,19 +48,38 @@ message ListRequest {
   optional int32 Page = 5;
 }
 
+// TODO: How to use uuid?
 message InfoRequest {
-  UUID Id = 1;
+//  UUID Id = 1;
+  string Id = 1;
 }
 
+
+message String {
+  string Id = 1;
+}
 service News {
-  rpc List (ListRequest) returns (NewsList) {
+  rpc List (google.protobuf.Empty) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      post: "/v1/list"
+      get: "/v1/news"
+    };
+  };
+  /*rpc List (ListRequest) returns (NewsList) {
+    option (google.api.http) = {
+      get: "/v1/news"
+    };
+  };
+  rpc Info (InfoRequest) returns (New) {
+    option (google.api.http) = {
+      get: "/v1/news/{Id}"
+    };
+  };
+  rpc Create (New) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/v1/news/create"
       body: "*"
     };
   };
-  rpc Info (InfoRequest) returns (New) {};
-  rpc Create (New) returns (google.protobuf.Empty) {};
   rpc Update (New) returns (google.protobuf.Empty) {};
-  rpc Delete (UUID) returns (google.protobuf.Empty) {};
+  rpc Delete (UUID) returns (google.protobuf.Empty) {};*/
 }

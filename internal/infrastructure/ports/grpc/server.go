@@ -1,8 +1,14 @@
 package grpc
 
 import (
+	"context"
 	"fmt"
 	gp "google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/reflection"
+	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/types/known/emptypb"
+	pg "grpc/internal/infrastructure/ports/grpc/proto_gen/grpc"
 	"log"
 	"net"
 )
@@ -18,10 +24,16 @@ func NewServer() *Server {
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
+	server := gp.NewServer()
 	s := &Server{
-		Server:   gp.NewServer(),
+		Server:   server,
 		Listener: lis,
 	}
+
+	reflection.Register(s.Server)
+	pg.RegisterNewsServer(s.Server, NewsServer{})
+	//pg.RegisterPromosServer(server, pg.UnimplementedPromosServer{})
+
 	return s
 }
 
@@ -33,3 +45,12 @@ func (s *Server) Serve() {
 
 	fmt.Println("Serving...")
 }
+
+type NewsServer struct {
+	pg.UnimplementedNewsServer
+}
+
+func (NewsServer) List(context.Context, *emptypb.Empty) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method List not implemented")
+}
+func (NewsServer) mustEmbedUnimplementedNewsServer() {}

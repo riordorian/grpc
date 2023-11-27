@@ -6,6 +6,7 @@ option go_package = "./grpc";
 import "uuid.proto";
 import "media.proto";
 import "google/protobuf/timestamp.proto";
+import "google/api/annotations.proto";
 
 enum PromoStatus {
   PROMO_INACTIVE = 0;
@@ -46,6 +47,10 @@ message PromoInfoRequest {
 
 
 service Promos {
-  rpc PromoList (PromoListRequest) returns (PromosList) {};
+  rpc PromoList (PromoListRequest) returns (PromosList) {
+    option (google.api.http) = {
+      get: "/v1/promos"
+    };
+  };
   rpc PromoInfo (PromoInfoRequest) returns (Promo) {};
 }
