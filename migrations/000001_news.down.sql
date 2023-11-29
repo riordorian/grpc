@@ -1,0 +1,5 @@
+DROP TABLE "news"
+DROP TABLE "media"
+DROP TABLE "news_media"
+DROP TABLE "tags"
+DROP TABLE "news_tags"
