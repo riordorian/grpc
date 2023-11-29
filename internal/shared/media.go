@@ -1,5 +1,7 @@
 package shared
 
+import "github.com/google/uuid"
+
 type MediaType int
 
 const (
@@ -9,6 +11,7 @@ const (
 )
 
 type Media struct {
+	Id   uuid.UUID
 	Name string
 	Path string
 	Type MediaType

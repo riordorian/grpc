@@ -2,7 +2,7 @@ package postgres
 
 import (
 	"context"
-
+	"fmt"
 	_ "github.com/jackc/pgx/stdlib"
 	"github.com/jmoiron/sqlx"
 )
@@ -16,6 +16,24 @@ type NewsRepository struct {
 	dbx         *sqlx.DB
 }
 
+func (s *NewsRepository) GetAll(ctx context.Context) {
+	if err := s.connect(ctx); err != nil {
+		fmt.Println(s.databaseUrl)
+		fmt.Println(err.Error())
+	}
+	fmt.Println(123)
+
+	defer s.close()
+
+	/*var movies []interface{}
+	if err := s.dbx.SelectContext(
+		ctx,
+		&movies,
+		`SELECT * FROM forms`); err != nil {
+		fmt.Println(movies)
+	}*/
+
+}
 func GetNewsRepository(databaseUrl string) *NewsRepository {
 	return &NewsRepository{
 		databaseUrl: databaseUrl,
