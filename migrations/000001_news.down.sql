@@ -1,5 +1,5 @@
-DROP TABLE "news"
-DROP TABLE "media"
-DROP TABLE "news_media"
-DROP TABLE "tags"
-DROP TABLE "news_tags"
+DROP TABLE news CASCADE;
+DROP TABLE media CASCADE;
+DROP TABLE news_media CASCADE;
+DROP TABLE tags CASCADE;
+DROP TABLE news_tags CASCADE;

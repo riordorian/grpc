@@ -3,27 +3,25 @@ package postgres
 import (
 	"context"
 	"fmt"
+	"github.com/google/uuid"
 	_ "github.com/jackc/pgx/stdlib"
-	"github.com/jmoiron/sqlx"
+	"grpc/internal/domain/news"
 )
 
 // TODO: Code of connect/close methods duplicated on each repository
 
-const driverName = "pgx"
+// Идея такая - на уровне адаптера создаю новую структуру транзактора, в которой будет осуществляться подключение к бд, закрытие соединения и указание на использование транзакций
+// Возвращаться будет
 
 type NewsRepository struct {
-	databaseUrl string
-	dbx         *sqlx.DB
+	db *Db
 }
 
-func (s *NewsRepository) GetAll(ctx context.Context) {
-	if err := s.connect(ctx); err != nil {
-		fmt.Println(s.databaseUrl)
-		fmt.Println(err.Error())
-	}
+func (r NewsRepository) GetList(ctx context.Context) ([]news.New, error) {
+
 	fmt.Println(123)
 
-	defer s.close()
+	return []news.New{}, nil
 
 	/*var movies []interface{}
 	if err := s.dbx.SelectContext(
@@ -34,22 +32,23 @@ func (s *NewsRepository) GetAll(ctx context.Context) {
 	}*/
 
 }
-func GetNewsRepository(databaseUrl string) *NewsRepository {
-	return &NewsRepository{
-		databaseUrl: databaseUrl,
-	}
+
+func (NewsRepository) GetById(uuid uuid.UUID) (news.New, error) {
+	return news.New{}, nil
 }
 
-func (s *NewsRepository) connect(ctx context.Context) error {
-	dbx, err := sqlx.ConnectContext(ctx, driverName, s.databaseUrl)
-	if err != nil {
-		return err
-	}
-
-	s.dbx = dbx
-	return nil
+func (NewsRepository) Insert(news.New) (uuid.UUID, error) {
+	return uuid.New(), nil
 }
 
-func (s *NewsRepository) close() error {
-	return s.dbx.Close()
+func (NewsRepository) Update(id uuid.UUID, fields news.New) (bool, error) {
+	return false, nil
+}
+
+func (NewsRepository) Delete(id uuid.UUID) (bool, error) {
+	return false, nil
+}
+
+func GetNewsRepository() NewsRepository {
+	return NewsRepository{}
 }

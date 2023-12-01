@@ -1,5 +1,5 @@
 CREATE TABLE "news" (
-    "id" uuid PRIMARY KEY,
+    "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     "title" varchar(200) NOT NULL,
     "text" text NOT NULL,
     "status" smallint NOT NULL,
@@ -10,7 +10,7 @@ CREATE TABLE "news" (
 );
 
 CREATE TABLE "media" (
-    "id" uuid PRIMARY KEY,
+    "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     "name" varchar(200) NOT NULL,
     "path" path NOT NULL,
     "type" smallint NOT NULL
@@ -23,7 +23,7 @@ CREATE TABLE "news_media" (
 );
 
 CREATE TABLE "tags" (
-    "id" uuid PRIMARY KEY,
+    "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     "text" varchar(200) NOT NULL,
     "user_id" uuid NOT NULL
 );

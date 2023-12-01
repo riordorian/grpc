@@ -8,6 +8,7 @@ import (
 	"google.golang.org/grpc/reflection"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
+	"grpc/internal/infrastructure/adapters/storage/postgres"
 	pg "grpc/internal/infrastructure/ports/grpc/proto_gen/grpc"
 	"log"
 	"net"
@@ -50,7 +51,16 @@ type NewsServer struct {
 	pg.UnimplementedNewsServer
 }
 
-func (NewsServer) List(context.Context, *emptypb.Empty) (*emptypb.Empty, error) {
+func (NewsServer) List(ctx context.Context, e *emptypb.Empty) (*emptypb.Empty, error) {
+	dbx := postgres.GetDb()
+	if err := dbx.Connect(ctx); err != nil {
+		fmt.Println(err.Error())
+	}
+	defer func() {
+		err := dbx.Close()
+		fmt.Println(err.Error())
+	}()
+
 	return nil, status.Errorf(codes.Unimplemented, "method List not implemented")
 }
 func (NewsServer) mustEmbedUnimplementedNewsServer() {}

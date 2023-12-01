@@ -1,10 +1,13 @@
 package news
 
-import "github.com/google/uuid"
+import (
+	"context"
+	"github.com/google/uuid"
+)
 
 type Request interface{}
 type Repository interface {
-	GetList(request Request) ([]New, error)
+	GetList(ctx context.Context) ([]New, error)
 	GetById(id uuid.UUID) (New, error)
 	Insert(New) (uuid.UUID, error)
 	Update(id uuid.UUID, fields New) (bool, error)
