@@ -6,12 +6,15 @@ import (
 )
 
 type Services struct {
+	Database       *postgres.Db
 	NewsRepository news.Repository
 }
 
 func GetServices() Services {
+	db := postgres.GetDb()
 	return Services{
 		//TODO: add url with confita
-		postgres.GetNewsRepository(),
+		db,
+		postgres.GetNewsRepository(db),
 	}
 }

@@ -1,18 +1,19 @@
 package ports
 
 import (
+	"grpc/internal/application"
 	"grpc/internal/infrastructure/ports/grpc"
 	"grpc/internal/infrastructure/ports/http"
 )
 
 type Services struct {
-	GrpcServer *grpc.Server
+	GrpcServer *grpc.NewsServer
 	HttpServer *http.Server
 }
 
-func GetServices() Services {
+func GetServices(appServices application.Services) Services {
 	return Services{
-		GrpcServer: grpc.NewServer(),
+		GrpcServer: grpc.NewServer(appServices.Handler),
 		HttpServer: http.GetServer(),
 	}
 }

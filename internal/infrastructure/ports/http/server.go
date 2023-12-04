@@ -40,9 +40,9 @@ func (s *Server) RegisterHandlers() error {
 		err = append(err, er.Error())
 	}
 
-	if er2 := grpc.RegisterPromosHandlerFromEndpoint(s.ctx, s.mux, "localhost:50051", s.opts); er2 != nil {
+	/*	if er2 := grpc.RegisterPromosHandlerFromEndpoint(s.ctx, s.mux, "localhost:50051", s.opts); er2 != nil {
 		err = append(err, er2.Error())
-	}
+	}*/
 
 	if len(err) != 0 {
 		return errors.New(strings.Join(err, ","))
@@ -52,7 +52,10 @@ func (s *Server) RegisterHandlers() error {
 }
 
 func (s *Server) ListenAndServe() {
-	defer s.cancel()
+	defer func() {
+		fmt.Println("Http server listener down")
+		s.cancel()
+	}()
 	fmt.Println("server listening at 8081")
 	if err := http.ListenAndServe(":8081", s.mux); err != nil {
 		panic(err)
