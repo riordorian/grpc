@@ -59,7 +59,7 @@ message String {
   string Id = 1;
 }
 service News {
-  rpc List (google.protobuf.Empty) returns (google.protobuf.Empty) {
+  rpc List (ListRequest) returns (NewsList) {
     option (google.api.http) = {
       get: "/v1/news"
     };

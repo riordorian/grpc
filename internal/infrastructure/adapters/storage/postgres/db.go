@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/jmoiron/sqlx"
+	"reflect"
 )
 
 type Db struct {
@@ -27,10 +28,35 @@ const driverName = "pgx"
 		Rollback() error
 	}
 */
-func GetDb() *Db {
-	return &Db{
+
+type DbInterface interface {
+	Connect(ctx context.Context) error
+	Close() error
+	Model(ctx context.Context) Querier
+}
+
+func GetContextDb(ctx context.Context) (context.Context, error) {
+	dbx := &Db{
 		url: "user=grpc password=password host=localhost port=5432 database=grpc sslmode=disable",
 	}
+	if err := dbx.Connect(ctx); err != nil {
+		return nil, err
+	}
+
+	ctx = context.WithValue(ctx, "ctxDb", dbx)
+
+	return ctx, nil
+}
+
+func GetDb(ctx context.Context) (*Db, error) {
+	db, ok := ctx.Value("ctxDb").(*Db)
+
+	// TODO: Type assertion?
+	if ok && db.dbx != nil && reflect.TypeOf(db.dbx).String() == "*sqlx.DB" {
+		return db, nil
+	}
+
+	return nil, errors.New("No database connection in context")
 }
 
 func (d *Db) Connect(ctx context.Context) error {

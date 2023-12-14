@@ -26,8 +26,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "type": "object",
-              "properties": {}
+              "$ref": "#/definitions/grpcNewsList"
             }
           },
           "default": {
@@ -37,6 +36,47 @@
             }
           }
         },
+        "parameters": [
+          {
+            "name": "Sort",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "Author",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "Status",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "INACTIVE",
+              "ACTIVE",
+              "DRAFT"
+            ],
+            "default": "INACTIVE"
+          },
+          {
+            "name": "Query",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "Page",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
         "tags": [
           "News"
         ]
@@ -126,6 +166,18 @@
         }
       }
     },
+    "grpcMedia": {
+      "type": "object",
+      "properties": {
+        "Media": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/grpcMediaItem"
+          }
+        }
+      }
+    },
     "grpcMediaItem": {
       "type": "object",
       "properties": {
@@ -151,6 +203,52 @@
         "DOCUMENT"
       ],
       "default": "IMAGE"
+    },
+    "grpcNew": {
+      "type": "object",
+      "properties": {
+        "Id": {
+          "$ref": "#/definitions/grpcUUID"
+        },
+        "Title": {
+          "type": "string"
+        },
+        "Text": {
+          "type": "string"
+        },
+        "ActivePeriod": {
+          "type": "string"
+        },
+        "Status": {
+          "$ref": "#/definitions/grpcStatus"
+        },
+        "Media": {
+          "$ref": "#/definitions/grpcMedia"
+        },
+        "CreatedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "UpdatedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "Tags": {
+          "type": "string"
+        }
+      }
+    },
+    "grpcNewsList": {
+      "type": "object",
+      "properties": {
+        "News": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/grpcNew"
+          }
+        }
+      }
     },
     "grpcPromo": {
       "type": "object",
@@ -215,6 +313,15 @@
           }
         }
       }
+    },
+    "grpcStatus": {
+      "type": "string",
+      "enum": [
+        "INACTIVE",
+        "ACTIVE",
+        "DRAFT"
+      ],
+      "default": "INACTIVE"
     },
     "grpcUUID": {
       "type": "object",

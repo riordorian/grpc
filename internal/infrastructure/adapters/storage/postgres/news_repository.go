@@ -2,7 +2,6 @@ package postgres
 
 import (
 	"context"
-	"fmt"
 	"github.com/google/uuid"
 	_ "github.com/jackc/pgx/stdlib"
 	"grpc/internal/domain/news"
@@ -14,30 +13,31 @@ import (
 // Возвращаться будет
 
 type NewsRepository struct {
-	db *Db
+	Db *Db
 }
 
-func (r NewsRepository) GetList(ctx context.Context) ([]news.New, error) {
+// TODO: Is it correct to use structure from Domain layer
+
+func (r NewsRepository) GetList(ctx context.Context, req news.ListRequest) ([]news.New, error) {
 	var result []news.New
-	rows, _ := r.db.Model(ctx).Queryx("SELECT * FROM news")
+	dbx, err := GetDb(ctx)
+	if err != nil {
+		return nil, err
+	}
+	rows, _ := dbx.Model(ctx).Queryx("SELECT * FROM news")
+
+	a := dbx.Model(ctx).NamedExec("SELECT * FROM news ")
 
 	var newItem news.New
 	for rows.Next() {
-		errScan := rows.StructScan(newItem)
-		result = append(result, newItem)
-		return nil, errScan
+		if errScan := rows.StructScan(&newItem); err != nil {
+			return nil, errScan
+		} else {
+			result = append(result, newItem)
+		}
 	}
-	fmt.Println(result)
-	return []news.New{}, nil
 
-	/*var movies []interface{}
-	if err := s.dbx.SelectContext(
-		ctx,
-		&movies,
-		`SELECT * FROM forms`); err != nil {
-		fmt.Println(movies)
-	}*/
-
+	return result, nil
 }
 
 func (NewsRepository) GetById(uuid uuid.UUID) (news.New, error) {
@@ -56,8 +56,6 @@ func (NewsRepository) Delete(id uuid.UUID) (bool, error) {
 	return false, nil
 }
 
-func GetNewsRepository(db *Db) NewsRepository {
-	return NewsRepository{
-		db,
-	}
+func GetNewsRepository() NewsRepository {
+	return NewsRepository{}
 }

@@ -11,7 +11,6 @@ import (
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
-	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -27,7 +26,7 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type NewsClient interface {
-	List(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	List(ctx context.Context, in *ListRequest, opts ...grpc.CallOption) (*NewsList, error)
 }
 
 type newsClient struct {
@@ -38,8 +37,8 @@ func NewNewsClient(cc grpc.ClientConnInterface) NewsClient {
 	return &newsClient{cc}
 }
 
-func (c *newsClient) List(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*emptypb.Empty, error) {
-	out := new(emptypb.Empty)
+func (c *newsClient) List(ctx context.Context, in *ListRequest, opts ...grpc.CallOption) (*NewsList, error) {
+	out := new(NewsList)
 	err := c.cc.Invoke(ctx, News_List_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -51,7 +50,7 @@ func (c *newsClient) List(ctx context.Context, in *emptypb.Empty, opts ...grpc.C
 // All implementations must embed UnimplementedNewsServer
 // for forward compatibility
 type NewsServer interface {
-	List(context.Context, *emptypb.Empty) (*emptypb.Empty, error)
+	List(context.Context, *ListRequest) (*NewsList, error)
 	mustEmbedUnimplementedNewsServer()
 }
 
@@ -59,7 +58,7 @@ type NewsServer interface {
 type UnimplementedNewsServer struct {
 }
 
-func (UnimplementedNewsServer) List(context.Context, *emptypb.Empty) (*emptypb.Empty, error) {
+func (UnimplementedNewsServer) List(context.Context, *ListRequest) (*NewsList, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method List not implemented")
 }
 func (UnimplementedNewsServer) mustEmbedUnimplementedNewsServer() {}
@@ -76,7 +75,7 @@ func RegisterNewsServer(s grpc.ServiceRegistrar, srv NewsServer) {
 }
 
 func _News_List_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(emptypb.Empty)
+	in := new(ListRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -88,7 +87,7 @@ func _News_List_Handler(srv interface{}, ctx context.Context, dec func(interface
 		FullMethod: News_List_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(NewsServer).List(ctx, req.(*emptypb.Empty))
+		return srv.(NewsServer).List(ctx, req.(*ListRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }

@@ -1,6 +1,7 @@
 package adapters
 
 import (
+	"context"
 	"grpc/internal/domain/news"
 	"grpc/internal/infrastructure/adapters/storage/postgres"
 )
@@ -10,11 +11,17 @@ type Services struct {
 	NewsRepository news.Repository
 }
 
-func GetServices() Services {
-	db := postgres.GetDb()
+func GetServices(ctx context.Context) (Services, error) {
+	cntx, err := postgres.GetContextDb(ctx)
+	if err != nil {
+		return Services{}, err
+	}
+
+	dbx, err := postgres.GetDb(cntx)
+
 	return Services{
 		//TODO: add url with confita
-		db,
-		postgres.GetNewsRepository(db),
-	}
+		dbx,
+		postgres.GetNewsRepository(),
+	}, nil
 }

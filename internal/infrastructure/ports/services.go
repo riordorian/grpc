@@ -13,7 +13,7 @@ type Services struct {
 
 func GetServices(appServices application.Services) Services {
 	return Services{
-		GrpcServer: grpc.NewServer(appServices.Handler),
-		HttpServer: http.GetServer(),
+		GrpcServer: grpc.NewServer(appServices.Handlers),
+		HttpServer: http.GetServer(appServices.Handler),
 	}
 }

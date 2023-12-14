@@ -5,8 +5,8 @@ import (
 	"fmt"
 	gp "google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
-	"google.golang.org/protobuf/types/known/emptypb"
-	appnews "grpc/internal/application/news"
+	"grpc/internal/application"
+	"grpc/internal/domain/news"
 	"grpc/internal/infrastructure/adapters/storage/postgres"
 	pg "grpc/internal/infrastructure/ports/grpc/proto_gen/grpc"
 	"log"
@@ -15,12 +15,14 @@ import (
 
 type NewsServer struct {
 	pg.UnimplementedNewsServer
-	Handler  appnews.ListHandler
+	Handlers application.Handlers
 	Server   *gp.Server
 	Listener net.Listener
 }
 
-func NewServer(handler appnews.ListHandler) *NewsServer {
+func (NewsServer) mustEmbedUnimplementedNewsServer() {}
+
+func NewServer(handlers application.Handlers) *NewsServer {
 	lis, err := net.Listen("tcp", "0.0.0.0:50051")
 	// TODO: Add logger
 	if err != nil {
@@ -30,11 +32,12 @@ func NewServer(handler appnews.ListHandler) *NewsServer {
 	s := &NewsServer{
 		Server:   server,
 		Listener: lis,
-		Handler:  handler,
+		Handlers: handlers,
 	}
 
 	reflection.Register(s.Server)
-	pg.RegisterNewsServer(s.Server, NewsServer{})
+	//pg.RegisterNewsServer(s.Server, NewsServer{})
+	pg.RegisterNewsServer(s.Server, s)
 	//pg.RegisterPromosServer(server, pg.UnimplementedPromosServer{})
 
 	return s
@@ -49,25 +52,55 @@ func (s NewsServer) Serve() {
 	fmt.Println("Serving...")
 }
 
-func (s NewsServer) List(ctx context.Context, e *emptypb.Empty) (*emptypb.Empty, error) {
-
-	dbx := postgres.GetDb()
-	if err := dbx.Connect(ctx); err != nil {
-		fmt.Println(err.Error())
-	}
-
-	eR := s.Handler.List(ctx)
-
-	if eR != nil {
-		fmt.Println(eR.Error())
+func (s NewsServer) List(ctx context.Context, req *pg.ListRequest) (*pg.NewsList, error) {
+	cntx, err := postgres.GetContextDb(ctx)
+	dbx, err := postgres.GetDb(cntx)
+	if err != nil {
+		fmt.Println()
+		panic(err.Error())
 	}
 
 	defer func() {
-		err := dbx.Close()
-		fmt.Println(err.Error())
+		if errClose := dbx.Close(); errClose != nil {
+			fmt.Println(errClose.Error())
+		}
 	}()
 
-	return e, nil
-}
+	page := *req.Page
+	if page == 0 {
+		page = 1
+	}
+	listRequest := news.ListRequest{
+		Sort:   *req.Sort,
+		Author: *req.Author,
+		Status: news.Status(req.Status.Number()),
+		Query:  *req.Query,
+		Page:   page,
+	}
+	list, listErr := s.Handlers.Queries.GetList.Handle(cntx, listRequest)
 
-func (NewsServer) mustEmbedUnimplementedNewsServer() {}
+	if listErr != nil {
+		return nil, listErr
+	}
+
+	var newDto pg.New
+	var newsList []*pg.New
+
+	for _, item := range list {
+		newDto = pg.New{
+			Id:           &pg.UUID{Id: item.Id.String()},
+			Title:        item.Title,
+			Text:         item.Text,
+			ActivePeriod: "",
+			Status:       pg.Status.Enum(pg.Status(item.Status)),
+			Media:        nil,
+			CreatedAt:    nil,
+			UpdatedAt:    nil,
+			Tags:         nil,
+		}
+
+		newsList = append(newsList, &newDto)
+	}
+
+	return &pg.NewsList{News: newsList}, nil
+}
