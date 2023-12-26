@@ -3,6 +3,7 @@ package grpc
 import (
 	"context"
 	"fmt"
+	"github.com/google/uuid"
 	gp "google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 	"grpc/internal/application"
@@ -70,13 +71,21 @@ func (s NewsServer) List(ctx context.Context, req *pg.ListRequest) (*pg.NewsList
 	if page == 0 {
 		page = 1
 	}
+
+	author, errParse := uuid.Parse(req.Author.GetId())
+	if errParse != nil {
+		fmt.Println(errParse)
+	}
+
 	listRequest := news.ListRequest{
-		Sort:   *req.Sort,
-		Author: *req.Author,
+		// TODO: Is it correct way?
+		Sort:   req.Sort.String(),
 		Status: news.Status(req.Status.Number()),
 		Query:  *req.Query,
 		Page:   page,
+		Author: author,
 	}
+
 	list, listErr := s.Handlers.Queries.GetList.Handle(cntx, listRequest)
 
 	if listErr != nil {

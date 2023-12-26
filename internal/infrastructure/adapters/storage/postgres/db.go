@@ -119,6 +119,7 @@ type Querier interface {
 	Select(dest interface{}, query string, args ...interface{}) error
 	Get(dest interface{}, query string, args ...interface{}) error
 	NamedExec(query string, arg interface{}) (sql.Result, error)
+	NamedQuery(query string, arg interface{}) (*sqlx.Rows, error)
 }
 
 func (q QueriesAdapter) adapt(dbx *sqlx.DB, tx *sqlx.Tx) Querier {

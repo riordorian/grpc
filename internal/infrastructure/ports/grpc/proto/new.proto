@@ -2,7 +2,7 @@ syntax = "proto3";
 
 import "google/protobuf/timestamp.proto";
 import "google/api/annotations.proto";
-import "google/protobuf/empty.proto";
+//import "google/protobuf/empty.proto";
 import "uuid.proto";
 import "media.proto";
 
@@ -14,6 +14,11 @@ enum Status {
   INACTIVE = 0;
   ACTIVE = 1;
   DRAFT = 2;
+}
+
+enum Sort {
+  DESC = 0;
+  ASC = 1;
 }
 
 message Media {
@@ -41,8 +46,8 @@ message ListStatusFilter {
 }
 
 message ListRequest {
-  optional int32 Sort = 1;
-  optional int32 Author = 2;
+  optional Sort Sort = 1;
+  optional UUID Author = 2;
   optional Status Status = 3;
   optional string Query = 4;
   optional int32 Page = 5;

@@ -24,9 +24,36 @@ func (r NewsRepository) GetList(ctx context.Context, req news.ListRequest) ([]ne
 	if err != nil {
 		return nil, err
 	}
-	rows, _ := dbx.Model(ctx).Queryx("SELECT * FROM news")
 
-	a := dbx.Model(ctx).NamedExec("SELECT * FROM news ")
+	query := map[string]interface{}{
+		"sort":   req.Sort,
+		"status": req.Status,
+	}
+
+	author := req.Author
+	switch author {
+	case uuid.Nil:
+		query["author"] = "not null"
+	default:
+		query["author"] = author
+	}
+
+	/*queryString := strings.Join(
+	[]string{
+		"SELECT * FROM news WHERE created_by=:author AND status=:status",
+		"ORDER BY created_at",
+		req.Sort,
+	},
+	" ")*/
+
+	queryString := "SELECT * FROM news ORDER BY created_at :sort"
+
+	//rows, err := dbx.Model(ctx).NamedQuery(queryString, query)
+	rows, err := dbx.Model(ctx).NamedQuery(queryString, map[string]interface{}{"sort": req.Sort})
+
+	if err != nil {
+		return nil, err
+	}
 
 	var newItem news.New
 	for rows.Next() {

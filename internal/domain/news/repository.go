@@ -15,8 +15,8 @@ type Repository interface {
 }
 
 type ListRequest struct {
-	Sort   int32
-	Author int32
+	Sort   string
+	Author uuid.UUID
 	Status Status
 	Query  string
 	Page   int32

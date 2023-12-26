@@ -41,15 +41,18 @@
             "name": "Sort",
             "in": "query",
             "required": false,
-            "type": "integer",
-            "format": "int32"
+            "type": "string",
+            "enum": [
+              "DESC",
+              "ASC"
+            ],
+            "default": "DESC"
           },
           {
-            "name": "Author",
+            "name": "Author.Id",
             "in": "query",
             "required": false,
-            "type": "integer",
-            "format": "int32"
+            "type": "string"
           },
           {
             "name": "Status",
@@ -313,6 +316,14 @@
           }
         }
       }
+    },
+    "grpcSort": {
+      "type": "string",
+      "enum": [
+        "DESC",
+        "ASC"
+      ],
+      "default": "DESC"
     },
     "grpcStatus": {
       "type": "string",

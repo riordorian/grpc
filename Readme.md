@@ -16,3 +16,12 @@ migrate create -ext sql -dir ./ -seq *MIGRATION_NAME*
 ```
 migrate -path ./ -database "postgresql://grpc:password@localhost:5432/grpc?sslmode=disable" -verbose up
 ```    
+
+
+## API GW
+Krakend used as api gw.
+
+Command example for compiling pb file for krakend
+```
+protoc -I=internal/infrastructure/ports/grpc/proto --descriptor_set_out=new.pb --include_imports internal/infrastructure/ports/grpc/proto/*.proto
+```
