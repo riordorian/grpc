@@ -92,11 +92,11 @@ func (s NewsServer) List(ctx context.Context, req *pg.ListRequest) (*pg.NewsList
 		return nil, listErr
 	}
 
-	var newDto pg.New
+	var newDto *pg.New
 	var newsList []*pg.New
 
 	for _, item := range list {
-		newDto = pg.New{
+		newDto = &pg.New{
 			Id:           &pg.UUID{Id: item.Id.String()},
 			Title:        item.Title,
 			Text:         item.Text,
@@ -108,7 +108,7 @@ func (s NewsServer) List(ctx context.Context, req *pg.ListRequest) (*pg.NewsList
 			Tags:         nil,
 		}
 
-		newsList = append(newsList, &newDto)
+		newsList = append(newsList, newDto)
 	}
 
 	return &pg.NewsList{News: newsList}, nil

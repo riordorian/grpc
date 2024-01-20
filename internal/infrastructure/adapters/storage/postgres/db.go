@@ -37,7 +37,8 @@ type DbInterface interface {
 
 func GetContextDb(ctx context.Context) (context.Context, error) {
 	dbx := &Db{
-		url: "user=grpc password=password host=localhost port=5432 database=grpc sslmode=disable",
+		url: "user=grpc password=password host=db port=5432 database=grpc sslmode=disable",
+		//url: "user=grpc password=password host=localhost port=5432 database=grpc sslmode=disable",
 	}
 	if err := dbx.Connect(ctx); err != nil {
 		return nil, err

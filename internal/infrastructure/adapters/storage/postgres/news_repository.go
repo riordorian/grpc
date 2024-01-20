@@ -5,6 +5,7 @@ import (
 	"github.com/google/uuid"
 	_ "github.com/jackc/pgx/stdlib"
 	"grpc/internal/domain/news"
+	"strings"
 )
 
 // TODO: Code of connect/close methods duplicated on each repository
@@ -30,6 +31,9 @@ func (r NewsRepository) GetList(ctx context.Context, req news.ListRequest) ([]ne
 		"status": req.Status,
 	}
 
+	/*query["sort"] = req.Sort
+	query["status"] = req.Status*/
+
 	author := req.Author
 	switch author {
 	case uuid.Nil:
@@ -38,18 +42,19 @@ func (r NewsRepository) GetList(ctx context.Context, req news.ListRequest) ([]ne
 		query["author"] = author
 	}
 
-	/*queryString := strings.Join(
-	[]string{
-		"SELECT * FROM news WHERE created_by=:author AND status=:status",
-		"ORDER BY created_at",
-		req.Sort,
-	},
-	" ")*/
+	queryString := strings.Join(
+		[]string{
+			//"SELECT * FROM news WHERE created_by=:author AND status=:status",
+			"SELECT * FROM news",
+			"ORDER BY created_at",
+			req.Sort,
+		},
+		" ")
 
-	queryString := "SELECT * FROM news ORDER BY created_at :sort"
+	//queryString := "SELECT * FROM news ORDER BY created_at :sort"
 
-	//rows, err := dbx.Model(ctx).NamedQuery(queryString, query)
-	rows, err := dbx.Model(ctx).NamedQuery(queryString, map[string]interface{}{"sort": req.Sort})
+	rows, err := dbx.Model(ctx).NamedQuery(queryString, query)
+	//rows, err := dbx.Model(ctx).NamedQuery(queryString, map[string]interface{}{})
 
 	if err != nil {
 		return nil, err
