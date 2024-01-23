@@ -1,4 +1,13 @@
 # Project info
+This is a pet golang project. 
+GRPC server on golang using clean architecture.
+
+## Components
+| Component      |   Vendor   |
+|----------------|:----------:|
+| Database       | PostgreSQL |
+| DB driver      |    Sqlx    |
+| Configurations |   Viper    |
 
 ## Migrations
 #### Installation

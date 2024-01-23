@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/jmoiron/sqlx"
+	"github.com/spf13/viper"
 	"reflect"
 )
 
@@ -37,7 +38,7 @@ type DbInterface interface {
 
 func GetContextDb(ctx context.Context) (context.Context, error) {
 	dbx := &Db{
-		url: "user=grpc password=password host=db port=5432 database=grpc sslmode=disable",
+		url: viper.Get("POSTGRES_DSN").(string),
 		//url: "user=grpc password=password host=localhost port=5432 database=grpc sslmode=disable",
 	}
 	if err := dbx.Connect(ctx); err != nil {

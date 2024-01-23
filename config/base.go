@@ -1,0 +1,32 @@
+package config
+
+import (
+	"fmt"
+	"github.com/spf13/viper"
+	"log"
+)
+
+func InitConfig() {
+	viper.AddConfigPath("../")
+	viper.SetConfigFile(".env")
+	if err := viper.ReadInConfig(); err != nil {
+		log.Fatalf("Error while reading config file %s", err)
+		// TODO: Panic handling()?
+		panic(err.Error())
+	}
+
+	if appEnv := viper.Get("APP_PROFILE"); appEnv == "local" {
+		viper.Set("POSTGRES_HOST", viper.Get("POSTGRES_HOST_LOCAL"))
+	}
+	viper.SetDefault("POSTGRES_PORT", 5432)
+
+	dbDsn := fmt.Sprintf(
+		"user=%s password=%s host=%s port=%d database=%s sslmode=disable",
+		viper.Get("POSTGRES_USER"),
+		viper.Get("POSTGRES_PASSWORD"),
+		viper.Get("POSTGRES_HOST"),
+		viper.GetInt32("POSTGRES_PORT"),
+		viper.Get("POSTGRES_DB"),
+	)
+	viper.Set("POSTGRES_DSN", dbDsn)
+}

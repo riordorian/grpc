@@ -20,7 +20,6 @@ func GetServices(ctx context.Context) (Services, error) {
 	dbx, err := postgres.GetDb(cntx)
 
 	return Services{
-		//TODO: add url with confita
 		dbx,
 		postgres.GetNewsRepository(),
 	}, nil

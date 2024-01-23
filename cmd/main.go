@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"grpc/config"
 	"grpc/internal/application"
 	"grpc/internal/infrastructure/adapters"
 	"grpc/internal/infrastructure/ports"
@@ -10,6 +11,7 @@ import (
 func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
+	config.InitConfig()
 
 	adapters, err := adapters.GetServices(ctx)
 	if err != nil {
