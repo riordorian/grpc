@@ -21,40 +21,30 @@ type NewsRepository struct {
 
 func (r NewsRepository) GetList(ctx context.Context, req news.ListRequest) ([]news.New, error) {
 	var result []news.New
-	dbx, err := GetDb(ctx)
-	if err != nil {
-		return nil, err
-	}
 
 	query := map[string]interface{}{
 		"sort":   req.Sort,
 		"status": req.Status,
 	}
 
-	/*query["sort"] = req.Sort
-	query["status"] = req.Status*/
-
 	author := req.Author
 	switch author {
 	case uuid.Nil:
 		query["author"] = "not null"
 	default:
-		query["author"] = author
+		// TODO: Move stringify to serializer
+		query["author"] = author.String()
 	}
 
 	queryString := strings.Join(
 		[]string{
-			//"SELECT * FROM news WHERE created_by=:author AND status=:status",
-			"SELECT * FROM news",
+			"SELECT * FROM news WHERE created_by=:author AND status=:status",
 			"ORDER BY created_at",
 			req.Sort,
 		},
 		" ")
 
-	//queryString := "SELECT * FROM news ORDER BY created_at :sort"
-
-	rows, err := dbx.Model(ctx).NamedQuery(queryString, query)
-	//rows, err := dbx.Model(ctx).NamedQuery(queryString, map[string]interface{}{})
+	rows, err := r.Db.NamedQuery(ctx, queryString, query)
 
 	if err != nil {
 		return nil, err
@@ -76,7 +66,12 @@ func (NewsRepository) GetById(uuid uuid.UUID) (news.New, error) {
 	return news.New{}, nil
 }
 
-func (NewsRepository) Insert(news.New) (uuid.UUID, error) {
+func (r NewsRepository) Insert(ctx context.Context, fields news.New) (uuid.UUID, error) {
+	sql := "INSERT INTO news (title, text, created_by, status) VALUES (:title, :text, :created_by, :status)"
+	_, err := r.Db.NamedExec(ctx, sql, fields)
+	if err != nil {
+		return uuid.New(), err
+	}
 	return uuid.New(), nil
 }
 
@@ -88,6 +83,8 @@ func (NewsRepository) Delete(id uuid.UUID) (bool, error) {
 	return false, nil
 }
 
-func GetNewsRepository() NewsRepository {
-	return NewsRepository{}
+func GetNewsRepository(db *Db) NewsRepository {
+	return NewsRepository{
+		db,
+	}
 }

@@ -8,7 +8,6 @@ import (
 	"google.golang.org/grpc/reflection"
 	"grpc/internal/application"
 	"grpc/internal/domain/news"
-	"grpc/internal/infrastructure/adapters/storage/postgres"
 	pg "grpc/internal/infrastructure/ports/grpc/proto_gen/grpc"
 	"log"
 	"net"
@@ -54,19 +53,7 @@ func (s NewsServer) Serve() {
 }
 
 func (s NewsServer) List(ctx context.Context, req *pg.ListRequest) (*pg.NewsList, error) {
-	cntx, err := postgres.GetContextDb(ctx)
-	dbx, err := postgres.GetDb(cntx)
-	if err != nil {
-		fmt.Println()
-		panic(err.Error())
-	}
-
-	defer func() {
-		if errClose := dbx.Close(); errClose != nil {
-			fmt.Println(errClose.Error())
-		}
-	}()
-
+	// TODO: Move to list request serializer
 	page := *req.Page
 	if page == 0 {
 		page = 1
@@ -86,7 +73,7 @@ func (s NewsServer) List(ctx context.Context, req *pg.ListRequest) (*pg.NewsList
 		Author: author,
 	}
 
-	list, listErr := s.Handlers.Queries.GetList.Handle(cntx, listRequest)
+	list, listErr := s.Handlers.Queries.GetList.Handle(ctx, listRequest)
 
 	if listErr != nil {
 		return nil, listErr

@@ -7,9 +7,9 @@ import (
 )
 
 type Services struct {
-	Handler    appnews.ListHandler
-	Repository news.Repository
-	Transactor storage.Transactor
+	//Handler    appnews.ListHandler
+	Repository news.RepositoryInterface
+	Transactor storage.TransactorInterface
 	Handlers   Handlers
 }
 
@@ -25,12 +25,12 @@ type Queries struct {
 type Commands struct {
 }
 
-func GetServices(repository news.Repository, transactor storage.Transactor) Services {
+func GetServices(repository news.RepositoryInterface, transactor storage.TransactorInterface) Services {
 	return Services{
-		Handler: appnews.ListHandler{
+		/*Handler: appnews.ListHandler{
 			Repo:       repository,
 			Transactor: transactor,
-		},
+		},*/
 
 		Handlers: Handlers{
 			Queries: Queries{

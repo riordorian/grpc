@@ -20,6 +20,7 @@ func InitConfig() {
 	}
 	viper.SetDefault("POSTGRES_PORT", 5432)
 
+	//dsn format: "user=grpc password=password host=localhost port=5432 database=grpc sslmode=disable",
 	dbDsn := fmt.Sprintf(
 		"user=%s password=%s host=%s port=%d database=%s sslmode=disable",
 		viper.Get("POSTGRES_USER"),

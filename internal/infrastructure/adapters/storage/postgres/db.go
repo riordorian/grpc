@@ -17,29 +17,9 @@ type Db struct {
 
 const driverName = "pgx"
 
-/*
-	type Dbx interface {
-		Begin() (Txx, error)
-		Connect(ctx context.Context) error
-		Close() error
-	}
-
-	type Txx interface {
-		Commit() error
-		Rollback() error
-	}
-*/
-
-type DbInterface interface {
-	Connect(ctx context.Context) error
-	Close() error
-	Model(ctx context.Context) Querier
-}
-
 func GetContextDb(ctx context.Context) (context.Context, error) {
 	dbx := &Db{
 		url: viper.Get("POSTGRES_DSN").(string),
-		//url: "user=grpc password=password host=localhost port=5432 database=grpc sslmode=disable",
 	}
 	if err := dbx.Connect(ctx); err != nil {
 		return nil, err
@@ -103,7 +83,7 @@ func (d *Db) MakeTransaction(ctx context.Context, tFunc func(ctx context.Context
 	return nil
 }
 
-func (d *Db) Model(ctx context.Context) Querier {
+func (d *Db) Model(ctx context.Context) QuerierInterface {
 	qa := &QueriesAdapter{}
 	if tx := extractCtxTransact(ctx); tx != nil {
 		return qa.adapt(d.dbx, tx)
@@ -115,7 +95,7 @@ func (d *Db) Model(ctx context.Context) Querier {
 // QueriesAdapter realization
 type QueriesAdapter struct{}
 
-type Querier interface {
+type QuerierInterface interface {
 	Queryx(query string, args ...interface{}) (*sqlx.Rows, error)
 	QueryRowx(query string, args ...interface{}) *sqlx.Row
 	Select(dest interface{}, query string, args ...interface{}) error
@@ -124,7 +104,9 @@ type Querier interface {
 	NamedQuery(query string, arg interface{}) (*sqlx.Rows, error)
 }
 
-func (q QueriesAdapter) adapt(dbx *sqlx.DB, tx *sqlx.Tx) Querier {
+// adapt is a method of QueriesAdapter that returns a QuerierInterface. It takes in
+// a dbx pointer and a tx pointer as parameters and returns a QuerierInterface.
+func (q QueriesAdapter) adapt(dbx *sqlx.DB, tx *sqlx.Tx) QuerierInterface {
 	if tx != nil {
 		return tx
 	}
@@ -132,9 +114,21 @@ func (q QueriesAdapter) adapt(dbx *sqlx.DB, tx *sqlx.Tx) Querier {
 	return dbx
 }
 
-/*func (d *Db) QueryRows(query string, args ...interface{}) (*sqlx.Rows, error) {
-	return d.dbx.Queryx(query, args)
+func (d *Db) Queryx(ctx context.Context, query string, args ...interface{}) (*sqlx.Rows, error) {
+	return d.Model(ctx).Queryx(query, args)
 }
-func (d *Db) QueryRow(query string, args ...interface{}) *sqlx.Row {
-	return d.dbx.QueryRowx(query, args)
-}*/
+func (d *Db) QueryRowx(ctx context.Context, query string, args ...interface{}) *sqlx.Row {
+	return d.Model(ctx).QueryRowx(query, args)
+}
+func (d *Db) Select(ctx context.Context, dest interface{}, query string, args ...interface{}) error {
+	return d.Model(ctx).Select(dest, query, args)
+}
+func (d *Db) Get(ctx context.Context, dest interface{}, query string, args ...interface{}) error {
+	return d.Model(ctx).Get(dest, query, args)
+}
+func (d *Db) NamedExec(ctx context.Context, query string, arg interface{}) (sql.Result, error) {
+	return d.Model(ctx).NamedExec(query, arg)
+}
+func (d *Db) NamedQuery(ctx context.Context, query string, arg interface{}) (*sqlx.Rows, error) {
+	return d.Model(ctx).NamedQuery(query, arg)
+}

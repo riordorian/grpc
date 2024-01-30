@@ -8,7 +8,7 @@ import (
 
 type Services struct {
 	Database       *postgres.Db
-	NewsRepository news.Repository
+	NewsRepository news.RepositoryInterface
 }
 
 func GetServices(ctx context.Context) (Services, error) {
@@ -21,6 +21,6 @@ func GetServices(ctx context.Context) (Services, error) {
 
 	return Services{
 		dbx,
-		postgres.GetNewsRepository(),
+		postgres.GetNewsRepository(dbx),
 	}, nil
 }
