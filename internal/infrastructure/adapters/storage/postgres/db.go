@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"github.com/jmoiron/sqlx"
-	"github.com/spf13/viper"
 	"reflect"
 )
 
@@ -17,9 +16,9 @@ type Db struct {
 
 const driverName = "pgx"
 
-func GetContextDb(ctx context.Context) (context.Context, error) {
+func GetContextDb(ctx context.Context, dsn string) (context.Context, error) {
 	dbx := &Db{
-		url: viper.Get("POSTGRES_DSN").(string),
+		url: dsn,
 	}
 	if err := dbx.Connect(ctx); err != nil {
 		return nil, err

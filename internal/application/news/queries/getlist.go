@@ -2,7 +2,6 @@ package queries
 
 import (
 	"context"
-	"github.com/google/uuid"
 	"grpc/internal/application/storage"
 	"grpc/internal/domain/news"
 )
@@ -24,7 +23,7 @@ func NewGetListHandler(repo news.RepositoryInterface, t storage.TransactorInterf
 }
 
 func (l ListHandler) Handle(ctx context.Context, req news.ListRequest) ([]news.New, error) {
-	err := l.Transactor.MakeTransaction(ctx, func(ctx context.Context) error {
+	/*err := l.Transactor.MakeTransaction(ctx, func(ctx context.Context) error {
 		id, _ := uuid.Parse("44266dc6-18d0-46bd-a2b5-238de53db2cb")
 		new := news.New{
 			Title:     "New 5",
@@ -48,7 +47,7 @@ func (l ListHandler) Handle(ctx context.Context, req news.ListRequest) ([]news.N
 			return err2
 		}
 		return nil
-	})
+	})*/
 	list, err := l.Repo.GetList(ctx, req)
 
 	if err != nil {

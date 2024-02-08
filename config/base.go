@@ -2,11 +2,13 @@ package config
 
 import (
 	"fmt"
-	"github.com/spf13/viper"
+	v "github.com/spf13/viper"
+	"grpc/internal/shared/interfaces"
 	"log"
 )
 
-func InitConfig() {
+func InitConfig() interfaces.ConfigProviderInterface {
+	viper := v.GetViper()
 	viper.AddConfigPath("../")
 	viper.SetConfigFile(".env")
 	if err := viper.ReadInConfig(); err != nil {
@@ -30,4 +32,6 @@ func InitConfig() {
 		viper.Get("POSTGRES_DB"),
 	)
 	viper.Set("POSTGRES_DSN", dbDsn)
+
+	return viper
 }
