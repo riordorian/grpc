@@ -24,19 +24,3 @@ type Queries struct {
 
 type Commands struct {
 }
-
-func GetServices(repository news.RepositoryInterface, transactor storage.TransactorInterface) Services {
-	return Services{
-		/*Handler: appnews.ListHandler{
-			Repo:       repository,
-			Transactor: transactor,
-		},*/
-
-		Handlers: Handlers{
-			Queries: Queries{
-				GetList: appnews.NewGetListHandler(repository, transactor),
-			},
-			Commands: Commands{},
-		},
-	}
-}

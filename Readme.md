@@ -3,11 +3,14 @@ This is a pet golang project.
 GRPC server on golang using clean architecture.
 
 ## Components
-| Component      |   Vendor   |
-|----------------|:----------:|
-| Database       | PostgreSQL |
-| DB driver      |    Sqlx    |
-| Configurations |   Viper    |
+| Component       |   Vendor   |
+|-----------------|:----------:|
+| Database        | PostgreSQL |
+| DB driver       |    Sqlx    |
+| Config provider |   Viper    |
+| DI Container    | Sarulabs |
+| Logger | Zap |
+
 
 ## Migrations
 #### Installation
@@ -25,6 +28,13 @@ migrate create -ext sql -dir ./ -seq *MIGRATION_NAME*
 ```
 migrate -path ./ -database "postgresql://grpc:password@localhost:5432/grpc?sslmode=disable" -verbose up
 ```    
+
+
+## Performance testing
+You can run concurrent calls of grpc method by using [ghz utility](https://ghz.sh/docs/examples).   
+```
+ghz --insecure --proto internal/infrastructure/ports/grpc/proto/new.proto --call grpc.News.List -d '{"Author": {"Id": "44266dc6-18d0-46bd-a2b5-238de53db2cb"}, "Page": 1, "Query": "", "Sort": "ASC", "Status": "ACTIVE"}' -n 2000 -c 20 --connections=10 --debug ./debug.json   0.0.0.0:50051
+```
 
 
 ## API GW

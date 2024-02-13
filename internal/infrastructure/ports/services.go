@@ -4,6 +4,7 @@ import (
 	"grpc/internal/application"
 	"grpc/internal/infrastructure/ports/grpc"
 	"grpc/internal/infrastructure/ports/http"
+	"grpc/internal/shared/interfaces"
 )
 
 type Services struct {
@@ -11,9 +12,9 @@ type Services struct {
 	HttpServer *http.Server
 }
 
-func GetServices(appServices application.Services) Services {
+func GetServices(configProvider interfaces.ConfigProviderInterface, handlers application.Handlers) Services {
 	return Services{
-		GrpcServer: grpc.NewServer(appServices.Handlers),
+		GrpcServer: grpc.NewServer(configProvider, handlers),
 		//HttpServer: http.GetServer(appServices.Handler),
 	}
 }

@@ -1,3 +1,6 @@
 .idea
 .env
-frontend
+_envoy.yaml
+envoy.yaml_2
+/frontend/
+main

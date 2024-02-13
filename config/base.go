@@ -22,6 +22,8 @@ func InitConfig() interfaces.ConfigProviderInterface {
 	}
 	viper.SetDefault("POSTGRES_PORT", 5432)
 
+	viper.SetDefault("GRPC_SERVER_HOST", "0.0.0.0")
+
 	//dsn format: "user=grpc password=password host=localhost port=5432 database=grpc sslmode=disable",
 	dbDsn := fmt.Sprintf(
 		"user=%s password=%s host=%s port=%d database=%s sslmode=disable",

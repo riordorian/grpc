@@ -5,6 +5,8 @@ import (
 	"github.com/sarulabs/di"
 	"github.com/spf13/viper"
 	"grpc/config"
+	"grpc/internal/application"
+	appnews "grpc/internal/application/news/queries"
 	"grpc/internal/domain/news"
 	"grpc/internal/infrastructure/adapters"
 	"grpc/internal/infrastructure/adapters/storage/postgres"
@@ -21,7 +23,7 @@ var Services = []di.Def{
 	},
 	{
 		Name:  "Database",
-		Scope: di.Request,
+		Scope: di.App,
 		Build: func(c di.Container) (interface{}, error) {
 			config := c.Get("ConfigProvider").(*viper.Viper)
 			ctx, err := postgres.GetContextDb(context.Background(), config.Get("POSTGRES_DSN").(string))
@@ -38,7 +40,7 @@ var Services = []di.Def{
 	},
 	{
 		Name:  "NewsRepository",
-		Scope: di.Request,
+		Scope: di.App,
 		Build: func(ctn di.Container) (interface{}, error) {
 			return postgres.GetNewsRepository(ctn.Get("Database").(*postgres.Db)), nil
 		},
@@ -52,6 +54,21 @@ var Services = []di.Def{
 			return adapters.Services{
 				Database:       dbx,
 				NewsRepository: ctn.Get("NewsRepository").(news.RepositoryInterface),
+			}, nil
+		},
+	},
+	{
+		Name:  "ApplicationHandlers",
+		Scope: di.App,
+		Build: func(ctn di.Container) (interface{}, error) {
+			transactor := ctn.Get("Database").(*postgres.Db)
+			repository := ctn.Get("NewsRepository").(news.RepositoryInterface)
+
+			return application.Handlers{
+				Queries: application.Queries{
+					GetList: appnews.NewGetListHandler(repository, transactor),
+				},
+				Commands: application.Commands{},
 			}, nil
 		},
 	},

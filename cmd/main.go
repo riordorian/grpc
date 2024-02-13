@@ -5,15 +5,14 @@ import (
 	"github.com/sarulabs/di"
 	"grpc/dependencies"
 	"grpc/internal/application"
-	"grpc/internal/infrastructure/adapters"
 	"grpc/internal/infrastructure/ports"
+	"grpc/internal/shared/interfaces"
 	"log"
 )
 
 func main() {
-	ctx, cancel := context.WithCancel(context.Background())
+	_, cancel := context.WithCancel(context.Background())
 	defer cancel()
-	//config := config.InitConfig()
 
 	builder, builderErr := di.NewBuilder()
 	if builderErr != nil {
@@ -33,12 +32,9 @@ func main() {
 		}
 	}()
 
-	adapters, err := adapters.GetServices(ctx)
-	if err != nil {
-		panic(err.Error())
-	}
-	appServices := application.GetServices(adapters.NewsRepository, adapters.Database)
-	portsServices := ports.GetServices(appServices)
+	handlers := app.Get("ApplicationHandlers").(application.Handlers)
+	configProvider := app.Get("ConfigProvider").(interfaces.ConfigProviderInterface)
+	portsServices := ports.GetServices(configProvider, handlers)
 
 	// TODO: graceful shutdown for http server on SIG or panic
 	//if err := portsServices.HttpServer.RegisterHandlers(); err != nil {

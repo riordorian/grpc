@@ -4,31 +4,35 @@ import (
 	"context"
 	"fmt"
 	"github.com/google/uuid"
+	"github.com/sarulabs/di"
 	gp "google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 	"grpc/internal/application"
 	"grpc/internal/domain/news"
 	pg "grpc/internal/infrastructure/ports/grpc/proto_gen/grpc"
+	"grpc/internal/shared/interfaces"
 	"log"
 	"net"
 )
 
 type NewsServer struct {
 	pg.UnimplementedNewsServer
-	Handlers application.Handlers
-	Server   *gp.Server
-	Listener net.Listener
+	Handlers  application.Handlers
+	Server    *gp.Server
+	Listener  net.Listener
+	Container di.Container
 }
 
 func (NewsServer) mustEmbedUnimplementedNewsServer() {}
 
-func NewServer(handlers application.Handlers) *NewsServer {
-	lis, err := net.Listen("tcp", "0.0.0.0:50051")
+func NewServer(configProvider interfaces.ConfigProviderInterface, handlers application.Handlers) *NewsServer {
+	address := fmt.Sprintf("%s:%s", configProvider.GetString("GRPC_SERVER_HOST"), configProvider.GetString("GRPC_SERVER_PORT"))
+	lis, err := net.Listen("tcp", address)
 	// TODO: Add logger
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
-	server := gp.NewServer()
+	server := gp.NewServer(gp.UnaryInterceptor(UnaryServerInterceptor))
 	s := &NewsServer{
 		Server:   server,
 		Listener: lis,
@@ -43,6 +47,16 @@ func NewServer(handlers application.Handlers) *NewsServer {
 	return s
 }
 
+func UnaryServerInterceptor(ctx context.Context, req any, info *gp.UnaryServerInfo, handler gp.UnaryHandler) (resp any, err error) {
+	fmt.Println("UnaryServerInterceptor")
+
+	return handler(ctx, req)
+}
+
+func (s NewsServer) SetHandlers(handlers application.Handlers) {
+	s.Handlers = handlers
+}
+
 func (s NewsServer) Serve() {
 	// TODO: Add logger
 	if err := s.Server.Serve(s.Listener); err != nil {
@@ -53,6 +67,7 @@ func (s NewsServer) Serve() {
 }
 
 func (s NewsServer) List(ctx context.Context, req *pg.ListRequest) (*pg.NewsList, error) {
+
 	// TODO: Move to list request serializer
 	page := *req.Page
 	if page == 0 {
