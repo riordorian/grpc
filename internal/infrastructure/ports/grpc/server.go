@@ -17,13 +17,15 @@ import (
 
 type NewsServer struct {
 	pg.UnimplementedNewsServer
+	pg.UnimplementedUsersServer
 	Handlers  application.Handlers
 	Server    *gp.Server
 	Listener  net.Listener
 	Container di.Container
 }
 
-func (NewsServer) mustEmbedUnimplementedNewsServer() {}
+func (NewsServer) mustEmbedUnimplementedNewsServer()  {}
+func (NewsServer) mustEmbedUnimplementedUsersServer() {}
 
 func NewServer(configProvider interfaces.ConfigProviderInterface, handlers application.Handlers) *NewsServer {
 	address := fmt.Sprintf("%s:%s", configProvider.GetString("GRPC_SERVER_HOST"), configProvider.GetString("GRPC_SERVER_PORT"))
@@ -42,6 +44,7 @@ func NewServer(configProvider interfaces.ConfigProviderInterface, handlers appli
 	reflection.Register(s.Server)
 	//pg.RegisterNewsServer(s.Server, NewsServer{})
 	pg.RegisterNewsServer(s.Server, s)
+	pg.RegisterUsersServer(s.Server, s)
 	//pg.RegisterPromosServer(server, pg.UnimplementedPromosServer{})
 
 	return s
@@ -114,4 +117,8 @@ func (s NewsServer) List(ctx context.Context, req *pg.ListRequest) (*pg.NewsList
 	}
 
 	return &pg.NewsList{News: newsList}, nil
+}
+
+func (s NewsServer) Login(ctx context.Context, req *pg.UserLoginRequest) (*pg.UserLoginResponse, error) {
+	return &pg.UserLoginResponse{}, nil
 }

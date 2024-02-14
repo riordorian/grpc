@@ -10,7 +10,6 @@ build:
  		--openapiv2_out ./internal/infrastructure/ports/http/api/ \
  		--openapiv2_opt ignore_comments=true \
  		--openapiv2_opt allow_merge=true \
- 		--openapiv2_opt allow_merge=true \
  		--openapiv2_opt generate_unbound_methods=false \
  		./internal/infrastructure/ports/grpc/proto/*.proto
 
