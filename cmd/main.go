@@ -4,9 +4,7 @@ import (
 	"context"
 	"github.com/sarulabs/di"
 	"grpc/dependencies"
-	"grpc/internal/application"
 	"grpc/internal/infrastructure/ports"
-	"grpc/internal/shared/interfaces"
 	"log"
 )
 
@@ -18,8 +16,20 @@ func main() {
 	if builderErr != nil {
 		panic(builderErr.Error())
 	}
+	c := len(dependencies.ConfigServices) +
+		len(dependencies.ConfigServices) +
+		len(dependencies.RepositoryServices) +
+		len(dependencies.AuthServices) +
+		len(dependencies.ApplicationServices) +
+		len(dependencies.PortsServices)
 
-	builderErr = builder.Add(dependencies.Services...)
+	var defs = make([]di.Def, 0, c)
+	defs = append(defs, dependencies.ConfigServices...)
+	defs = append(defs, dependencies.RepositoryServices...)
+	defs = append(defs, dependencies.AuthServices...)
+	defs = append(defs, dependencies.ApplicationServices...)
+	defs = append(defs, dependencies.PortsServices...)
+	builderErr = builder.Add(defs...)
 	if builderErr != nil {
 		log.Fatal(builderErr.Error())
 	}
@@ -32,9 +42,7 @@ func main() {
 		}
 	}()
 
-	handlers := app.Get("ApplicationHandlers").(application.Handlers)
-	configProvider := app.Get("ConfigProvider").(interfaces.ConfigProviderInterface)
-	portsServices := ports.GetServices(configProvider, handlers)
+	portsServices := app.Get("PortsServices").(ports.Services)
 
 	// TODO: graceful shutdown for http server on SIG or panic
 	//if err := portsServices.HttpServer.RegisterHandlers(); err != nil {
