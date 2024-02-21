@@ -35,6 +35,7 @@ var PortsServices = []di.Def{
 				Convertors: grpc.Convertors{
 					ListRequest:  new(convertors.ListRequestConvertor),
 					ListResponse: new(convertors.ListResponseConvertor),
+					LoginRequest: new(convertors.UserLoginRequestConvertor),
 				},
 			}
 

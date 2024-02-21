@@ -11,11 +11,11 @@ type ListHandler struct {
 	Transactor storage.TransactorInterface
 }
 
-type GetListHandler interface {
+type GetListHandlerInterface interface {
 	Handle(ctx context.Context, req news.ListRequest) ([]news.New, error)
 }
 
-func NewGetListHandler(repo news.RepositoryInterface, t storage.TransactorInterface) ListHandler {
+func NewGetListHandler(repo news.RepositoryInterface, t storage.TransactorInterface) GetListHandlerInterface {
 	return ListHandler{
 		Repo:       repo,
 		Transactor: t,
