@@ -13,9 +13,10 @@ import (
 )
 
 type Convertors struct {
-	ListRequest  convertors.ListRequestConvertorInterface
-	ListResponse convertors.ListResponseConvertorInterface
-	LoginRequest convertors.UserLoginRequestConvertorInterface
+	ListRequest   convertors.ListRequestConvertorInterface
+	ListResponse  convertors.ListResponseConvertorInterface
+	LoginRequest  convertors.UserLoginRequestConvertorInterface
+	LoginResponse convertors.UserLoginResponseConvertorInterface
 }
 
 type NewsServer struct {
@@ -70,11 +71,15 @@ func (s NewsServer) Login(ctx context.Context, req *pg.UserLoginRequest) (*pg.Us
 		return nil, err
 	}
 
-	login, err := s.Handlers.Queries.Login.Handle(ctx, loginRequest)
+	token, err := s.Handlers.Queries.Login.Handle(ctx, loginRequest)
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println(login)
+	rawToken, err := s.Convertors.LoginResponse.Convert(token)
+	if err != nil {
+		return nil, err
 
-	return &pg.UserLoginResponse{}, nil
+	}
+
+	return rawToken, nil
 }

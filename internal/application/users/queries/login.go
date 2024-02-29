@@ -2,8 +2,7 @@ package users
 
 import (
 	"context"
-	"fmt"
-	"grpc/internal/domain/news"
+	"github.com/golang-jwt/jwt"
 	"grpc/internal/infrastructure/adapters/auth"
 	"grpc/internal/shared/interfaces"
 )
@@ -13,7 +12,7 @@ type LoginHandler struct {
 }
 
 type LoginHandlerInterface interface {
-	Handle(ctx context.Context, req auth.LoginRequest) ([]news.New, error)
+	Handle(ctx context.Context, req auth.LoginRequest) (jwt.Token, error)
 }
 
 func NewLoginHandler(authProvider interfaces.AuthProviderInterface) LoginHandlerInterface {
@@ -22,12 +21,11 @@ func NewLoginHandler(authProvider interfaces.AuthProviderInterface) LoginHandler
 	}
 }
 
-func (l LoginHandler) Handle(ctx context.Context, req auth.LoginRequest) ([]news.New, error) {
-	login, err := l.AuthProvider.Login(req.Login, req.Password)
+func (l LoginHandler) Handle(ctx context.Context, req auth.LoginRequest) (jwt.Token, error) {
+	token, err := l.AuthProvider.Login(req.Login, req.Password)
 	if err != nil {
-		return nil, err
+		return jwt.Token{}, err
 	}
-	fmt.Println(login)
 
-	return nil, nil
+	return token, nil
 }

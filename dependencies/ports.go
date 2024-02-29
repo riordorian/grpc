@@ -33,9 +33,10 @@ var PortsServices = []di.Def{
 				Listener: lis,
 				Handlers: ctn.Get("ApplicationHandlers").(application.Handlers),
 				Convertors: grpc.Convertors{
-					ListRequest:  new(convertors.ListRequestConvertor),
-					ListResponse: new(convertors.ListResponseConvertor),
-					LoginRequest: new(convertors.UserLoginRequestConvertor),
+					ListRequest:   new(convertors.ListRequestConvertor),
+					ListResponse:  new(convertors.ListResponseConvertor),
+					LoginRequest:  new(convertors.UserLoginRequestConvertor),
+					LoginResponse: new(convertors.UserLoginResponseConvertor),
 				},
 			}
 

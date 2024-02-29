@@ -19,6 +19,8 @@ var AuthServices = []di.Def{
 				ClientId:   config.GetString("KEYCLOAK_CLIENT_ID"),
 				GrantType:  config.GetString("KEYCLOAK_GRANT_TYPE"),
 				HTTPClient: new(http.Client),
+				RS256:      config.GetString("KEYCLOAK_RS256_KEY"),
+				Secret:     config.GetString("KEYCLOAK_SECRET"),
 			}, nil
 		},
 	},

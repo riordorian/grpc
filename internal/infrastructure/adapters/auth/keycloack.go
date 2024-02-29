@@ -17,6 +17,8 @@ type Keycloak struct {
 	ClientId   string
 	GrantType  string
 	HTTPClient *http.Client
+	RS256      string
+	Secret     string
 }
 
 type errorResponse struct {
@@ -37,17 +39,16 @@ type LoginRequest struct {
 }
 
 func (k Keycloak) Login(login string, password string) (jwt.Token, error) {
+	if "" == k.RS256 || "" == k.Secret {
+		return jwt.Token{}, errors.New("keycloak: rs256 key and secret are required")
+	}
+
 	url := fmt.Sprintf("%s/realms/%s/protocol/openid-connect/token", k.BaseUrl, k.Realm)
-	/*loginReq := LoginRequest{
-		Login:     login,
-		Password:  password,
-		GrantType: k.GrantType,
-		ClientId:  k.ClientId,
-	}*/
 
 	body := urlpack.Values{}
 	body.Add("grant_type", k.GrantType)
 	body.Add("client_id", k.ClientId)
+	body.Add("client_secret", "oxDr0qGGSObGDYnoCaHGOgJoVnjCx4A2")
 	body.Add("username", login)
 	body.Add("password", password)
 
@@ -55,9 +56,32 @@ func (k Keycloak) Login(login string, password string) (jwt.Token, error) {
 	if err != nil {
 		return jwt.Token{}, err
 	}
-	az := k.sendRequest(req, &jwt.Token{})
-	fmt.Println(az)
-	return jwt.Token{}, nil
+	var response map[string]interface{}
+	err = k.sendRequest(req, &response)
+	if err != nil {
+		return jwt.Token{}, err
+	}
+
+	accessToken := response["access_token"].(string)
+
+	token, err := jwt.Parse(accessToken, func(token *jwt.Token) (interface{}, error) {
+		secretKey := "-----BEGIN CERTIFICATE-----\n" +
+			k.RS256 +
+			"\n-----END CERTIFICATE-----"
+
+		key, _ := jwt.ParseRSAPublicKeyFromPEM([]byte(secretKey))
+
+		if _, ok := token.Method.(*jwt.SigningMethodRSA); !ok {
+			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
+		}
+		return key, nil
+	})
+
+	if err != nil {
+		return jwt.Token{}, err
+	}
+
+	return *token, nil
 }
 
 func (k Keycloak) sendRequest(req *http.Request, v interface{}) error {
@@ -84,10 +108,8 @@ func (k Keycloak) sendRequest(req *http.Request, v interface{}) error {
 		return fmt.Errorf("unknown error, status code: %d", res.StatusCode)
 	}
 
-	fullResponse := successResponse{
-		Data: v,
-	}
-	if err = json.NewDecoder(res.Body).Decode(&fullResponse); err != nil {
+	err = json.NewDecoder(res.Body).Decode(&v)
+	if err != nil {
 		return err
 	}
 
