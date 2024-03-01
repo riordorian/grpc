@@ -10,6 +10,7 @@ import (
 	"grpc/internal/infrastructure/ports"
 	"grpc/internal/infrastructure/ports/grpc"
 	"grpc/internal/infrastructure/ports/grpc/convertors"
+	"grpc/internal/infrastructure/ports/grpc/interceptors"
 	pg "grpc/internal/infrastructure/ports/grpc/proto_gen/grpc"
 	"log"
 	"net"
@@ -27,7 +28,8 @@ var PortsServices = []di.Def{
 			if err != nil {
 				log.Fatalf("failed to listen: %v", err)
 			}
-			server := gp.NewServer(gp.UnaryInterceptor(grpc.UnaryServerInterceptor))
+			authInterceptor := ctn.Get("AuthInterceptor").(interceptors.AuthInterceptor)
+			server := gp.NewServer(gp.ChainUnaryInterceptor(authInterceptor.Get()))
 			s := &grpc.NewsServer{
 				Server:   server,
 				Listener: lis,
@@ -58,6 +60,13 @@ var PortsServices = []di.Def{
 				GrpcServer: ctn.Get("GrpcServer").(*grpc.NewsServer),
 				//HttpServer: http.GetServer(appServices.Handler),
 			}, nil
+		},
+	},
+	{
+		Name:  "AuthInterceptor",
+		Scope: di.App,
+		Build: func(ctn di.Container) (interface{}, error) {
+			return interceptors.AuthInterceptor{}, nil
 		},
 	},
 }

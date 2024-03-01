@@ -64,6 +64,16 @@ func (k Keycloak) Login(login string, password string) (jwt.Token, error) {
 
 	accessToken := response["access_token"].(string)
 
+	token, err := k.parseToken(accessToken)
+
+	if err != nil {
+		return jwt.Token{}, err
+	}
+
+	return token, nil
+}
+
+func (k Keycloak) parseToken(accessToken string) (jwt.Token, error) {
 	token, err := jwt.Parse(accessToken, func(token *jwt.Token) (interface{}, error) {
 		secretKey := "-----BEGIN CERTIFICATE-----\n" +
 			k.RS256 +
@@ -77,11 +87,16 @@ func (k Keycloak) Login(login string, password string) (jwt.Token, error) {
 		return key, nil
 	})
 
+	return *token, err
+}
+
+func (k Keycloak) CheckLogin(token string) (bool, error) {
+	accessToken, err := k.parseToken(token)
 	if err != nil {
-		return jwt.Token{}, err
+		return false, err
 	}
 
-	return *token, nil
+	return accessToken.Valid, nil
 }
 
 func (k Keycloak) sendRequest(req *http.Request, v interface{}) error {
