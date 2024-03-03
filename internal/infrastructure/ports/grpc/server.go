@@ -32,12 +32,6 @@ type NewsServer struct {
 func (NewsServer) mustEmbedUnimplementedNewsServer()  {}
 func (NewsServer) mustEmbedUnimplementedUsersServer() {}
 
-func UnaryServerInterceptor(ctx context.Context, req any, info *gp.UnaryServerInfo, handler gp.UnaryHandler) (resp any, err error) {
-	fmt.Println("UnaryServerInterceptor")
-
-	return handler(ctx, req)
-}
-
 func (s NewsServer) SetHandlers(handlers application.Handlers) {
 	s.Handlers = handlers
 }

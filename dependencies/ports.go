@@ -12,6 +12,7 @@ import (
 	"grpc/internal/infrastructure/ports/grpc/convertors"
 	"grpc/internal/infrastructure/ports/grpc/interceptors"
 	pg "grpc/internal/infrastructure/ports/grpc/proto_gen/grpc"
+	"grpc/internal/shared/interfaces"
 	"log"
 	"net"
 )
@@ -66,7 +67,9 @@ var PortsServices = []di.Def{
 		Name:  "AuthInterceptor",
 		Scope: di.App,
 		Build: func(ctn di.Container) (interface{}, error) {
-			return interceptors.AuthInterceptor{}, nil
+			return interceptors.AuthInterceptor{
+				AuthProvider: ctn.Get("AuthProvider").(interfaces.AuthProviderInterface),
+			}, nil
 		},
 	},
 }

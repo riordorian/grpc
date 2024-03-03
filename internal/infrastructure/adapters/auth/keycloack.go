@@ -21,6 +21,10 @@ type Keycloak struct {
 	Secret     string
 }
 
+type Claims struct {
+	jwt.StandardClaims
+}
+
 type errorResponse struct {
 	Code    int    `json:"code"`
 	Message string `json:"message"`
@@ -64,7 +68,7 @@ func (k Keycloak) Login(login string, password string) (jwt.Token, error) {
 
 	accessToken := response["access_token"].(string)
 
-	token, err := k.parseToken(accessToken)
+	token, _, err := k.parseToken(accessToken)
 
 	if err != nil {
 		return jwt.Token{}, err
@@ -73,8 +77,9 @@ func (k Keycloak) Login(login string, password string) (jwt.Token, error) {
 	return token, nil
 }
 
-func (k Keycloak) parseToken(accessToken string) (jwt.Token, error) {
-	token, err := jwt.Parse(accessToken, func(token *jwt.Token) (interface{}, error) {
+func (k Keycloak) parseToken(accessToken string) (jwt.Token, jwt.MapClaims, error) {
+	claims := jwt.MapClaims{}
+	token, err := jwt.ParseWithClaims(accessToken, &claims, func(token *jwt.Token) (interface{}, error) {
 		secretKey := "-----BEGIN CERTIFICATE-----\n" +
 			k.RS256 +
 			"\n-----END CERTIFICATE-----"
@@ -87,16 +92,29 @@ func (k Keycloak) parseToken(accessToken string) (jwt.Token, error) {
 		return key, nil
 	})
 
-	return *token, err
+	return *token, claims, err
 }
 
 func (k Keycloak) CheckLogin(token string) (bool, error) {
-	accessToken, err := k.parseToken(token)
+	accessToken, _, err := k.parseToken(token)
 	if err != nil {
 		return false, err
 	}
 
 	return accessToken.Valid, nil
+}
+
+func (k Keycloak) Can(action string, token string) (bool, error) {
+	accessToken, claims, err := k.parseToken(token)
+	if !accessToken.Valid || err != nil {
+		return false, errors.New("jwt is not valid")
+	}
+
+	resourcesAccess := claims["resource_access"].(map[string]interface{})
+	fmt.Println(resourcesAccess)
+
+	return true, nil
+
 }
 
 func (k Keycloak) sendRequest(req *http.Request, v interface{}) error {
