@@ -82,9 +82,3 @@ func (NewsRepository) Update(id uuid.UUID, fields news.New) (bool, error) {
 func (NewsRepository) Delete(id uuid.UUID) (bool, error) {
 	return false, nil
 }
-
-func GetNewsRepository(db *Db) NewsRepository {
-	return NewsRepository{
-		db,
-	}
-}

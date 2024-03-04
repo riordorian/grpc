@@ -3,55 +3,34 @@ package grpc
 import (
 	"context"
 	"fmt"
-	"github.com/google/uuid"
 	"github.com/sarulabs/di"
 	gp "google.golang.org/grpc"
-	"google.golang.org/grpc/reflection"
 	"grpc/internal/application"
-	"grpc/internal/domain/news"
+	"grpc/internal/infrastructure/ports/grpc/convertors"
 	pg "grpc/internal/infrastructure/ports/grpc/proto_gen/grpc"
-	"grpc/internal/shared/interfaces"
 	"log"
 	"net"
 )
 
+type Convertors struct {
+	ListRequest   convertors.ListRequestConvertorInterface
+	ListResponse  convertors.ListResponseConvertorInterface
+	LoginRequest  convertors.UserLoginRequestConvertorInterface
+	LoginResponse convertors.UserLoginResponseConvertorInterface
+}
+
 type NewsServer struct {
 	pg.UnimplementedNewsServer
-	Handlers  application.Handlers
-	Server    *gp.Server
-	Listener  net.Listener
-	Container di.Container
+	pg.UnimplementedUsersServer
+	Handlers   application.Handlers
+	Server     *gp.Server
+	Listener   net.Listener
+	Container  di.Container
+	Convertors Convertors
 }
 
-func (NewsServer) mustEmbedUnimplementedNewsServer() {}
-
-func NewServer(configProvider interfaces.ConfigProviderInterface, handlers application.Handlers) *NewsServer {
-	address := fmt.Sprintf("%s:%s", configProvider.GetString("GRPC_SERVER_HOST"), configProvider.GetString("GRPC_SERVER_PORT"))
-	lis, err := net.Listen("tcp", address)
-	// TODO: Add logger
-	if err != nil {
-		log.Fatalf("failed to listen: %v", err)
-	}
-	server := gp.NewServer(gp.UnaryInterceptor(UnaryServerInterceptor))
-	s := &NewsServer{
-		Server:   server,
-		Listener: lis,
-		Handlers: handlers,
-	}
-
-	reflection.Register(s.Server)
-	//pg.RegisterNewsServer(s.Server, NewsServer{})
-	pg.RegisterNewsServer(s.Server, s)
-	//pg.RegisterPromosServer(server, pg.UnimplementedPromosServer{})
-
-	return s
-}
-
-func UnaryServerInterceptor(ctx context.Context, req any, info *gp.UnaryServerInfo, handler gp.UnaryHandler) (resp any, err error) {
-	fmt.Println("UnaryServerInterceptor")
-
-	return handler(ctx, req)
-}
+func (NewsServer) mustEmbedUnimplementedNewsServer()  {}
+func (NewsServer) mustEmbedUnimplementedUsersServer() {}
 
 func (s NewsServer) SetHandlers(handlers application.Handlers) {
 	s.Handlers = handlers
@@ -67,51 +46,34 @@ func (s NewsServer) Serve() {
 }
 
 func (s NewsServer) List(ctx context.Context, req *pg.ListRequest) (*pg.NewsList, error) {
-
-	// TODO: Move to list request serializer
-	page := *req.Page
-	if page == 0 {
-		page = 1
-	}
-
-	author, errParse := uuid.Parse(req.Author.GetId())
-	if errParse != nil {
-		fmt.Println(errParse)
-	}
-
-	listRequest := news.ListRequest{
-		// TODO: Is it correct way?
-		Sort:   req.Sort.String(),
-		Status: news.Status(req.Status.Number()),
-		Query:  *req.Query,
-		Page:   page,
-		Author: author,
+	listRequest, err := s.Convertors.ListRequest.Convert(req)
+	if err != nil {
+		return nil, err
 	}
 
 	list, listErr := s.Handlers.Queries.GetList.Handle(ctx, listRequest)
-
 	if listErr != nil {
 		return nil, listErr
 	}
 
-	var newDto *pg.New
-	var newsList []*pg.New
+	return s.Convertors.ListResponse.Convert(list), nil
+}
 
-	for _, item := range list {
-		newDto = &pg.New{
-			Id:           &pg.UUID{Id: item.Id.String()},
-			Title:        item.Title,
-			Text:         item.Text,
-			ActivePeriod: "",
-			Status:       pg.Status.Enum(pg.Status(item.Status)),
-			Media:        nil,
-			CreatedAt:    nil,
-			UpdatedAt:    nil,
-			Tags:         nil,
-		}
-
-		newsList = append(newsList, newDto)
+func (s NewsServer) Login(ctx context.Context, req *pg.UserLoginRequest) (*pg.UserLoginResponse, error) {
+	loginRequest, err := s.Convertors.LoginRequest.Convert(req)
+	if err != nil {
+		return nil, err
 	}
 
-	return &pg.NewsList{News: newsList}, nil
+	token, err := s.Handlers.Queries.Login.Handle(ctx, loginRequest)
+	if err != nil {
+		return nil, err
+	}
+	rawToken, err := s.Convertors.LoginResponse.Convert(token)
+	if err != nil {
+		return nil, err
+
+	}
+
+	return rawToken, nil
 }

@@ -10,6 +10,9 @@
     },
     {
       "name": "Promos"
+    },
+    {
+      "name": "Users"
     }
   ],
   "consumes": [
@@ -78,6 +81,12 @@
             "required": false,
             "type": "integer",
             "format": "int32"
+          },
+          {
+            "name": "Token",
+            "in": "query",
+            "required": false,
+            "type": "string"
           }
         ],
         "tags": [
@@ -145,6 +154,42 @@
         ],
         "tags": [
           "Promos"
+        ]
+      }
+    },
+    "/v1/user/login": {
+      "get": {
+        "operationId": "Users_Login",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/grpcUserLoginResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "Login",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "Password",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Users"
         ]
       }
     }
@@ -338,6 +383,14 @@
       "type": "object",
       "properties": {
         "Id": {
+          "type": "string"
+        }
+      }
+    },
+    "grpcUserLoginResponse": {
+      "type": "object",
+      "properties": {
+        "Token": {
           "type": "string"
         }
       }
