@@ -30,11 +30,6 @@ type errorResponse struct {
 	Message string `json:"message"`
 }
 
-type successResponse struct {
-	Code int         `json:"code"`
-	Data interface{} `json:"data"`
-}
-
 type LoginRequest struct {
 	Login     string `json:"login"`
 	Password  string `json:"password"`
@@ -52,7 +47,7 @@ func (k Keycloak) Login(login string, password string) (jwt.Token, error) {
 	body := urlpack.Values{}
 	body.Add("grant_type", k.GrantType)
 	body.Add("client_id", k.ClientId)
-	body.Add("client_secret", "oxDr0qGGSObGDYnoCaHGOgJoVnjCx4A2")
+	body.Add("client_secret", k.Secret)
 	body.Add("username", login)
 	body.Add("password", password)
 
@@ -111,9 +106,16 @@ func (k Keycloak) Can(action string, token string) (bool, error) {
 	}
 
 	resourcesAccess := claims["resource_access"].(map[string]interface{})
-	fmt.Println(resourcesAccess)
+	grpcAccess := resourcesAccess["grpc"].(map[string]interface{})
+	grpcRoles := grpcAccess["roles"].([]interface{})
 
-	return true, nil
+	for _, role := range grpcRoles {
+		if role.(string) == action {
+			return true, nil
+		}
+	}
+
+	return false, errors.New("action is not allowed")
 
 }
 
@@ -123,7 +125,7 @@ func (k Keycloak) sendRequest(req *http.Request, v interface{}) error {
 
 	res, err := k.HTTPClient.Do(req)
 	if err != nil {
-		return err
+		return errors.New("error when sending request to keycloak." + err.Error())
 	}
 
 	defer func() {
