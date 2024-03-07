@@ -2,7 +2,7 @@ package convertors
 
 import (
 	"grpc/internal/infrastructure/adapters/auth"
-	pg "grpc/internal/infrastructure/ports/grpc/proto_gen/grpc"
+	pg "grpc/pkg/proto_gen/grpc"
 )
 
 type UserLoginRequestConvertorInterface interface {

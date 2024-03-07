@@ -4,15 +4,15 @@ import (
 	"fmt"
 	"github.com/sarulabs/di"
 	"github.com/spf13/viper"
-	gp "google.golang.org/grpc"
+	gpc "google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 	"grpc/internal/application"
 	"grpc/internal/infrastructure/ports"
 	"grpc/internal/infrastructure/ports/grpc"
 	"grpc/internal/infrastructure/ports/grpc/convertors"
 	"grpc/internal/infrastructure/ports/grpc/interceptors"
-	pg "grpc/internal/infrastructure/ports/grpc/proto_gen/grpc"
 	"grpc/internal/shared/interfaces"
+	gproto "grpc/pkg/proto_gen/grpc"
 	"log"
 	"net"
 )
@@ -30,7 +30,7 @@ var PortsServices = []di.Def{
 				log.Fatalf("failed to listen: %v", err)
 			}
 			authInterceptor := ctn.Get("AuthInterceptor").(interceptors.AuthInterceptor)
-			server := gp.NewServer(gp.ChainUnaryInterceptor(authInterceptor.Get()))
+			server := gpc.NewServer(gpc.ChainUnaryInterceptor(authInterceptor.Get()))
 			s := &grpc.NewsServer{
 				Server:   server,
 				Listener: lis,
@@ -45,8 +45,8 @@ var PortsServices = []di.Def{
 
 			reflection.Register(s.Server)
 			//pg.RegisterNewsServer(s.Server, NewsServer{})
-			pg.RegisterNewsServer(s.Server, s)
-			pg.RegisterUsersServer(s.Server, s)
+			gproto.RegisterNewsServer(s.Server, s)
+			gproto.RegisterUsersServer(s.Server, s)
 			//pg.RegisterPromosServer(server, pg.UnimplementedPromosServer{})
 
 			return s, nil

@@ -4,10 +4,9 @@ package mocks
 
 import (
 	context "context"
+	"grpc/pkg/proto_gen/grpc"
 
 	google_golang_orggrpc "google.golang.org/grpc"
-
-	grpc "grpc/internal/infrastructure/ports/grpc/proto_gen/grpc"
 
 	mock "github.com/stretchr/testify/mock"
 )
