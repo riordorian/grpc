@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -37,7 +38,7 @@ type LoginRequest struct {
 	ClientId  string `json:"client_id"`
 }
 
-func (k Keycloak) Login(login string, password string) (jwt.Token, error) {
+func (k Keycloak) Login(ctx context.Context, login string, password string) (jwt.Token, error) {
 	if "" == k.RS256 || "" == k.Secret {
 		return jwt.Token{}, errors.New("keycloak: rs256 key and secret are required")
 	}
@@ -82,7 +83,7 @@ func (k Keycloak) parseToken(accessToken string) (jwt.Token, jwt.MapClaims, erro
 		key, _ := jwt.ParseRSAPublicKeyFromPEM([]byte(secretKey))
 
 		if _, ok := token.Method.(*jwt.SigningMethodRSA); !ok {
-			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
+			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
 		return key, nil
 	})

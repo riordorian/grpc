@@ -4,6 +4,7 @@ import (
 	"github.com/google/uuid"
 	"grpc/internal/domain/tags"
 	"grpc/internal/shared"
+	"grpc/internal/shared/structures"
 	"time"
 )
 
@@ -13,13 +14,11 @@ const (
 	DRAFT
 )
 
-type Status int
-
 type New struct {
-	Id          uuid.UUID `json:"id" db:"id"`
-	Title       string    `json:"title" db:"title"`
-	Text        string    `json:"text" db:"text"`
-	Status      Status    `json:"status" db:"status"`
+	Id          uuid.UUID         `json:"id" db:"id"`
+	Title       string            `json:"title" db:"title"`
+	Text        string            `json:"text" db:"text"`
+	Status      structures.Status `json:"status" db:"status"`
 	Media       []shared.Media
 	Attachments []shared.Media
 	CreatedAt   time.Time `json:"created_at" db:"created_at"`
