@@ -53,6 +53,12 @@ You can run concurrent calls of grpc method by using [ghz utility](https://ghz.s
 ghz --insecure --proto internal/infrastructure/ports/grpc/proto/new.proto --call grpc.News.List -d '{"Author": {"Id": "44266dc6-18d0-46bd-a2b5-238de53db2cb"}, "Page": 1, "Query": "", "Sort": "ASC", "Status": "ACTIVE"}' -n 2000 -c 20 --connections=10 --debug ./debug.json   0.0.0.0:50051
 ```
 
+### Mocks generation
+```
+mockery --all
+```
+Generate mock structures in pkg dir 
+
 
 ## API GW
 Krakend used as api gw.
