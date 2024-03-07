@@ -5,6 +5,7 @@ import (
 	"github.com/google/uuid"
 	_ "github.com/jackc/pgx/stdlib"
 	"grpc/internal/domain/news"
+	"grpc/internal/shared/structures"
 	"strings"
 )
 
@@ -19,7 +20,7 @@ type NewsRepository struct {
 
 // TODO: Is it correct to use structure from Domain layer
 
-func (r NewsRepository) GetList(ctx context.Context, req news.ListRequest) ([]news.New, error) {
+func (r NewsRepository) GetList(ctx context.Context, req structures.ListRequest) ([]news.New, error) {
 	var result []news.New
 
 	query := map[string]interface{}{

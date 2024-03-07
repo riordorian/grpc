@@ -22,7 +22,8 @@ func NewLoginHandler(authProvider interfaces.AuthProviderInterface) LoginHandler
 }
 
 func (l LoginHandler) Handle(ctx context.Context, req auth.LoginRequest) (jwt.Token, error) {
-	token, err := l.AuthProvider.Login(req.Login, req.Password)
+	// Todo: Add context
+	token, err := l.AuthProvider.Login(ctx, req.Login, req.Password)
 	if err != nil {
 		return jwt.Token{}, err
 	}

@@ -10,6 +10,7 @@ GRPC server on golang using clean architecture.
 | Config provider |   Viper    |
 | DI Container    | Sarulabs |
 | Logger | Zap |
+| Mocks | Mockery |
 
 
 ## Migrations
@@ -29,8 +30,24 @@ migrate create -ext sql -dir ./ -seq *MIGRATION_NAME*
 migrate -path ./ -database "postgresql://grpc:password@localhost:5432/grpc?sslmode=disable" -verbose up
 ```    
 
+## Testing
 
-## Performance testing
+### Test coverage
+
+Run 
+```
+go test ./... -coverprofile cover.out
+```
+to collect coverage statistics.
+
+Run
+```
+go tool cover -html=cover.out
+```
+to build ui statistic page
+
+ 
+### Performance testing
 You can run concurrent calls of grpc method by using [ghz utility](https://ghz.sh/docs/examples).   
 ```
 ghz --insecure --proto internal/infrastructure/ports/grpc/proto/new.proto --call grpc.News.List -d '{"Author": {"Id": "44266dc6-18d0-46bd-a2b5-238de53db2cb"}, "Page": 1, "Query": "", "Sort": "ASC", "Status": "ACTIVE"}' -n 2000 -c 20 --connections=10 --debug ./debug.json   0.0.0.0:50051
