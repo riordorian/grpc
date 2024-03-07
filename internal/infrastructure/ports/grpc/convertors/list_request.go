@@ -2,8 +2,8 @@ package convertors
 
 import (
 	"github.com/google/uuid"
-	pg "grpc/internal/infrastructure/ports/grpc/proto_gen/grpc"
 	"grpc/internal/shared/structures"
+	pg "grpc/pkg/proto_gen/grpc"
 )
 
 type ListRequestConvertorInterface interface {

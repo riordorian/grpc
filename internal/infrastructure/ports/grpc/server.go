@@ -7,7 +7,7 @@ import (
 	gp "google.golang.org/grpc"
 	"grpc/internal/application"
 	"grpc/internal/infrastructure/ports/grpc/convertors"
-	pg "grpc/internal/infrastructure/ports/grpc/proto_gen/grpc"
+	"grpc/pkg/proto_gen/grpc"
 	"log"
 	"net"
 )
@@ -20,8 +20,8 @@ type Convertors struct {
 }
 
 type NewsServer struct {
-	pg.UnimplementedNewsServer
-	pg.UnimplementedUsersServer
+	grpc.UnimplementedNewsServer
+	grpc.UnimplementedUsersServer
 	Handlers   application.Handlers
 	Server     *gp.Server
 	Listener   net.Listener
@@ -45,7 +45,7 @@ func (s NewsServer) Serve() {
 	fmt.Println("Serving...")
 }
 
-func (s NewsServer) List(ctx context.Context, req *pg.ListRequest) (*pg.NewsList, error) {
+func (s NewsServer) List(ctx context.Context, req *grpc.ListRequest) (*grpc.NewsList, error) {
 	listRequest, err := s.Convertors.ListRequest.Convert(req)
 	if err != nil {
 		return nil, err
@@ -59,7 +59,7 @@ func (s NewsServer) List(ctx context.Context, req *pg.ListRequest) (*pg.NewsList
 	return s.Convertors.ListResponse.Convert(list), nil
 }
 
-func (s NewsServer) Login(ctx context.Context, req *pg.UserLoginRequest) (*pg.UserLoginResponse, error) {
+func (s NewsServer) Login(ctx context.Context, req *grpc.UserLoginRequest) (*grpc.UserLoginResponse, error) {
 	loginRequest, err := s.Convertors.LoginRequest.Convert(req)
 	if err != nil {
 		return nil, err

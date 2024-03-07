@@ -8,7 +8,7 @@ import (
 	gp "google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	appnews "grpc/internal/application/news/queries"
-	"grpc/internal/infrastructure/ports/grpc/proto_gen/grpc"
+	"grpc/pkg/proto_gen/grpc"
 	"net/http"
 	"strings"
 )

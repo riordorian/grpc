@@ -2,7 +2,7 @@ package convertors
 
 import (
 	"github.com/golang-jwt/jwt"
-	pg "grpc/internal/infrastructure/ports/grpc/proto_gen/grpc"
+	pg "grpc/pkg/proto_gen/grpc"
 )
 
 type UserLoginResponseConvertorInterface interface {

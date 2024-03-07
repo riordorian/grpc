@@ -4,8 +4,8 @@ import (
 	"context"
 	"errors"
 	gp "google.golang.org/grpc"
-	"grpc/internal/infrastructure/ports/grpc/proto_gen/grpc"
 	"grpc/internal/shared/interfaces"
+	"grpc/pkg/proto_gen/grpc"
 )
 
 type AuthInterceptor struct {

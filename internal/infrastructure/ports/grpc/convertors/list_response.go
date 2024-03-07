@@ -2,26 +2,26 @@ package convertors
 
 import (
 	"grpc/internal/domain/news"
-	pg "grpc/internal/infrastructure/ports/grpc/proto_gen/grpc"
+	"grpc/pkg/proto_gen/grpc"
 )
 
 type ListResponseConvertorInterface interface {
-	Convert([]news.New) *pg.NewsList
+	Convert([]news.New) *grpc.NewsList
 }
 type ListResponseConvertor struct {
 }
 
-func (l ListResponseConvertor) Convert(list []news.New) *pg.NewsList {
-	var newDto *pg.New
-	var newsList []*pg.New
+func (l ListResponseConvertor) Convert(list []news.New) *grpc.NewsList {
+	var newDto *grpc.New
+	var newsList []*grpc.New
 
 	for _, item := range list {
-		newDto = &pg.New{
-			Id:           &pg.UUID{Id: item.Id.String()},
+		newDto = &grpc.New{
+			Id:           &grpc.UUID{Id: item.Id.String()},
 			Title:        item.Title,
 			Text:         item.Text,
 			ActivePeriod: "",
-			Status:       pg.Status.Enum(pg.Status(item.Status)),
+			Status:       grpc.Status.Enum(grpc.Status(item.Status)),
 			Media:        nil,
 			CreatedAt:    nil,
 			UpdatedAt:    nil,
@@ -31,5 +31,5 @@ func (l ListResponseConvertor) Convert(list []news.New) *pg.NewsList {
 		newsList = append(newsList, newDto)
 	}
 
-	return &pg.NewsList{News: newsList}
+	return &grpc.NewsList{News: newsList}
 }

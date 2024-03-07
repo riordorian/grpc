@@ -3,7 +3,7 @@
 package mocks
 
 import (
-	grpc "grpc/internal/infrastructure/ports/grpc/proto_gen/grpc"
+	"grpc/pkg/proto_gen/grpc"
 
 	jwt "github.com/golang-jwt/jwt"
 
