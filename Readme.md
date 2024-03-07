@@ -3,14 +3,15 @@ This is a pet golang project.
 GRPC server on golang using clean architecture.
 
 ## Components
-| Component       |   Vendor   |
-|-----------------|:----------:|
-| Database        | PostgreSQL |
-| DB driver       |    Sqlx    |
-| Config provider |   Viper    |
-| DI Container    | Sarulabs |
-| Logger | Zap |
-| Mocks | Mockery |
+| Component       |                    Vendor                    |
+|-----------------|:--------------------------------------------:|
+| Database        |                  PostgreSQL                  |
+| DB driver       |                     Sqlx                     |
+| Config provider |                  [Viper](https://github.com/spf13/viper)                   |
+| DI Container    |  [Sarulabs](https://github.com/sarulabs/di)  |
+| Logger |    [Zap](https://github.com/uber-go/zap)     |
+| Mocks | [Mockery](https://github.com/vektra/mockery) |
+ | CLI commands |   [Cobra](https://github.com/spf13/cobra)    |
 
 
 ## Migrations
