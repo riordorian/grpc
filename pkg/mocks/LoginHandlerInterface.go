@@ -4,9 +4,8 @@ package mocks
 
 import (
 	context "context"
-	auth "grpc/internal/infrastructure/adapters/auth"
-
 	jwt "github.com/golang-jwt/jwt"
+	"grpc/internal/infrastructure/adapters/auth"
 
 	mock "github.com/stretchr/testify/mock"
 )
