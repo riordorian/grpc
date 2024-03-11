@@ -5,7 +5,7 @@ import (
 	"errors"
 	"grpc/internal/application/storage"
 	"grpc/internal/domain/news"
-	"grpc/internal/shared/structures"
+	"grpc/internal/shared/dto"
 	"grpc/pkg/mocks"
 	"reflect"
 	"testing"
@@ -18,23 +18,23 @@ func TestListHandler_Handle(t *testing.T) {
 	}
 	type args struct {
 		ctx context.Context
-		req structures.ListRequest
+		req dto.ListRequest
 	}
 
 	repo := mocks.NewRepositoryInterface(t)
 	transactor := mocks.NewTransactorInterface(t)
 	ctx := context.Background()
 
-	emptyRequest := structures.ListRequest{}
-	invalidRequest := structures.ListRequest{
+	emptyRequest := dto.ListRequest{}
+	invalidRequest := dto.ListRequest{
 		Page: -1,
 	}
 
-	repo.EXPECT().GetList(ctx, emptyRequest).RunAndReturn(func(ctx context.Context, request structures.ListRequest) ([]news.New, error) {
+	repo.EXPECT().GetList(ctx, emptyRequest).RunAndReturn(func(ctx context.Context, request dto.ListRequest) ([]news.New, error) {
 		return []news.New{}, nil
 	})
 	repo.EXPECT().GetList(ctx, invalidRequest).RunAndReturn(
-		func(ctx context.Context, request structures.ListRequest) ([]news.New, error) {
+		func(ctx context.Context, request dto.ListRequest) ([]news.New, error) {
 			return []news.New{}, errors.New("invalid request")
 		})
 

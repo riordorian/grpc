@@ -1,4 +1,4 @@
-package dependencies
+package di
 
 import (
 	"github.com/sarulabs/di"
@@ -7,7 +7,7 @@ import (
 	appusers "grpc/internal/application/users/queries"
 	"grpc/internal/domain/news"
 	"grpc/internal/infrastructure/adapters"
-	"grpc/internal/infrastructure/adapters/storage/postgres"
+	"grpc/internal/infrastructure/db"
 	"grpc/internal/shared/interfaces"
 )
 
@@ -16,7 +16,7 @@ var ApplicationServices = []di.Def{
 		Name:  "ApplicationHandlers",
 		Scope: di.App,
 		Build: func(ctn di.Container) (interface{}, error) {
-			transactor := ctn.Get("Database").(*postgres.Db)
+			transactor := ctn.Get("Database").(*db.Db)
 			repository := ctn.Get("NewsRepository").(news.RepositoryInterface)
 			authProvider := ctn.Get("AuthProvider").(interfaces.AuthProviderInterface)
 
@@ -33,7 +33,7 @@ var ApplicationServices = []di.Def{
 		Name:  "AdaptersServices",
 		Scope: di.App,
 		Build: func(ctn di.Container) (interface{}, error) {
-			dbx := ctn.Get("Database").(*postgres.Db)
+			dbx := ctn.Get("Database").(*db.Db)
 
 			return adapters.Services{
 				Database:       dbx,

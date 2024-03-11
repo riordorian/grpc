@@ -3,7 +3,7 @@
 package mocks
 
 import (
-	auth "grpc/internal/infrastructure/adapters/auth"
+	"grpc/internal/infrastructure/adapters/auth"
 	"grpc/pkg/proto_gen/grpc"
 
 	mock "github.com/stretchr/testify/mock"

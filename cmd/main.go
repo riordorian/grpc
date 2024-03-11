@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/sarulabs/di"
 	"github.com/spf13/cobra"
-	"grpc/dependencies"
+	dic "grpc/internal/infrastructure/di"
 	"grpc/internal/infrastructure/ports"
 	"log"
 	"os"
@@ -50,19 +50,19 @@ func bootstrap() di.Container {
 	if builderErr != nil {
 		panic(builderErr.Error())
 	}
-	c := len(dependencies.ConfigServices) +
-		len(dependencies.ConfigServices) +
-		len(dependencies.RepositoryServices) +
-		len(dependencies.AuthServices) +
-		len(dependencies.ApplicationServices) +
-		len(dependencies.PortsServices)
+	c := len(dic.ConfigServices) +
+		len(dic.ConfigServices) +
+		len(dic.RepositoryServices) +
+		len(dic.AuthServices) +
+		len(dic.ApplicationServices) +
+		len(dic.PortsServices)
 
 	var defs = make([]di.Def, 0, c)
-	defs = append(defs, dependencies.ConfigServices...)
-	defs = append(defs, dependencies.RepositoryServices...)
-	defs = append(defs, dependencies.AuthServices...)
-	defs = append(defs, dependencies.ApplicationServices...)
-	defs = append(defs, dependencies.PortsServices...)
+	defs = append(defs, dic.ConfigServices...)
+	defs = append(defs, dic.RepositoryServices...)
+	defs = append(defs, dic.AuthServices...)
+	defs = append(defs, dic.ApplicationServices...)
+	defs = append(defs, dic.PortsServices...)
 	builderErr = builder.Add(defs...)
 	if builderErr != nil {
 		log.Fatal(builderErr.Error())

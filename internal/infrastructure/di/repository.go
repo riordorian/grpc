@@ -1,10 +1,11 @@
-package dependencies
+package di
 
 import (
 	"context"
 	"github.com/sarulabs/di"
 	"github.com/spf13/viper"
 	"grpc/internal/infrastructure/adapters/storage/postgres"
+	"grpc/internal/infrastructure/db"
 	"log"
 )
 
@@ -14,12 +15,12 @@ var RepositoryServices = []di.Def{
 		Scope: di.App,
 		Build: func(c di.Container) (interface{}, error) {
 			config := c.Get("ConfigProvider").(*viper.Viper)
-			ctx, err := postgres.GetContextDb(context.Background(), config.Get("POSTGRES_DSN").(string))
+			ctx, err := db.GetContextDb(context.Background(), config.Get("POSTGRES_DSN").(string))
 			if err != nil {
 				log.Fatal(err.Error())
 			}
 
-			db, err := postgres.GetDb(ctx)
+			db, err := db.GetDb(ctx)
 			if err != nil {
 				return nil, err
 			}
@@ -31,7 +32,7 @@ var RepositoryServices = []di.Def{
 		Scope: di.App,
 		Build: func(ctn di.Container) (interface{}, error) {
 			return postgres.NewsRepository{
-				Db: ctn.Get("Database").(*postgres.Db),
+				Db: ctn.Get("Database").(*db.Db),
 			}, nil
 		},
 	},

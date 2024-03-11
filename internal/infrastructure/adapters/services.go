@@ -2,12 +2,12 @@ package adapters
 
 import (
 	"grpc/internal/domain/news"
-	"grpc/internal/infrastructure/adapters/storage/postgres"
+	"grpc/internal/infrastructure/db"
 	"grpc/internal/shared/interfaces"
 )
 
 type Services struct {
-	Database       *postgres.Db
+	Database       *db.Db
 	NewsRepository news.RepositoryInterface
 	AuthProvider   interfaces.AuthProviderInterface
 }

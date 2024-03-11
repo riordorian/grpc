@@ -1,4 +1,4 @@
-package postgres
+package db
 
 import (
 	"context"
@@ -37,7 +37,7 @@ func GetDb(ctx context.Context) (*Db, error) {
 		return db, nil
 	}
 
-	return nil, errors.New("No database connection in context")
+	return nil, errors.New("no database connection in context")
 }
 
 func (d *Db) Connect(ctx context.Context) error {
