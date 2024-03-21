@@ -60,6 +60,16 @@ message InfoRequest {
   string Id = 1;
 }
 
+message CreateRequest {
+  string Title = 1;
+  string Text = 2;
+  optional string Tags = 5;
+  repeated MediaUploadRequest Media = 6;
+}
+
+message CreateResponse {
+  bool Status = 1;
+}
 
 message String {
   string Id = 1;
@@ -70,20 +80,16 @@ service News {
       get: "/v1/news"
     };
   };
-  /*rpc List (ListRequest) returns (NewsList) {
-    option (google.api.http) = {
-      get: "/v1/news"
-    };
-  };
-  rpc Info (InfoRequest) returns (New) {
-    option (google.api.http) = {
-      get: "/v1/news/{Id}"
-    };
-  };
-  rpc Create (New) returns (google.protobuf.Empty) {
+  rpc Create (stream CreateRequest) returns (CreateResponse) {
     option (google.api.http) = {
       post: "/v1/news/create"
       body: "*"
+    };
+  };
+
+  /*rpc Info (InfoRequest) returns (New) {
+    option (google.api.http) = {
+      get: "/v1/news/{Id}"
     };
   };
   rpc Update (New) returns (google.protobuf.Empty) {};

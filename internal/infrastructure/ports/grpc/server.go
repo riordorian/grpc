@@ -8,8 +8,10 @@ import (
 	"grpc/internal/application"
 	"grpc/internal/infrastructure/ports/grpc/convertors"
 	"grpc/pkg/proto_gen/grpc"
+	"io"
 	"log"
 	"net"
+	"os"
 )
 
 type Convertors struct {
@@ -57,6 +59,36 @@ func (s NewsServer) List(ctx context.Context, req *grpc.ListRequest) (*grpc.News
 	}
 
 	return s.Convertors.ListResponse.Convert(list), nil
+}
+
+func (s NewsServer) Create(stream grpc.News_CreateServer) error {
+	for {
+		req, err := stream.Recv()
+
+		if err == io.EOF {
+			break
+		}
+
+		media := req.GetMedia()
+
+		for i := range media {
+			file, err := os.Create(media[i].GetFileName())
+			if err != nil {
+				fmt.Println("Error creating file:", err)
+				return err
+			}
+			file.Write(media[i].GetChunk())
+			//fmt.Println(media[i].GetChunk())
+		}
+
+	}
+
+	_, createErr := s.Handlers.Commands.Create.Handle("created.png")
+	if createErr != nil {
+		return createErr
+	}
+
+	return stream.SendAndClose(&grpc.CreateResponse{Status: true})
 }
 
 func (s NewsServer) Login(ctx context.Context, req *grpc.UserLoginRequest) (*grpc.UserLoginResponse, error) {

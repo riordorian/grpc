@@ -1,6 +1,7 @@
 package application
 
 import (
+	appnewscommands "grpc/internal/application/news/commands"
 	appnews "grpc/internal/application/news/queries"
 	"grpc/internal/application/storage"
 	appusers "grpc/internal/application/users/queries"
@@ -10,10 +11,11 @@ import (
 
 type Services struct {
 	//Handler    appnews.ListHandler
-	Repository   news.RepositoryInterface
-	Transactor   storage.TransactorInterface
-	Handlers     Handlers
-	AuthProvider interfaces.AuthProviderInterface
+	Repository          news.RepositoryInterface
+	Transactor          storage.TransactorInterface
+	Handlers            Handlers
+	AuthProvider        interfaces.AuthProviderInterface
+	FileStorageProvider interfaces.FileStorageProviderInterface
 }
 
 type Handlers struct {
@@ -27,4 +29,5 @@ type Queries struct {
 }
 
 type Commands struct {
+	Create appnewscommands.CreateHandlerInterface
 }

@@ -94,6 +94,39 @@
         ]
       }
     },
+    "/v1/news/create": {
+      "post": {
+        "operationId": "News_Create",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/grpcCreateResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "description": " (streaming inputs)",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/grpcCreateRequest"
+            }
+          }
+        ],
+        "tags": [
+          "News"
+        ]
+      }
+    },
     "/v1/promos": {
       "get": {
         "operationId": "Promos_PromoList",
@@ -214,6 +247,35 @@
         }
       }
     },
+    "grpcCreateRequest": {
+      "type": "object",
+      "properties": {
+        "Title": {
+          "type": "string"
+        },
+        "Text": {
+          "type": "string"
+        },
+        "Tags": {
+          "type": "string"
+        },
+        "Media": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/grpcMediaUploadRequest"
+          }
+        }
+      }
+    },
+    "grpcCreateResponse": {
+      "type": "object",
+      "properties": {
+        "Status": {
+          "type": "boolean"
+        }
+      }
+    },
     "grpcMedia": {
       "type": "object",
       "properties": {
@@ -251,6 +313,18 @@
         "DOCUMENT"
       ],
       "default": "IMAGE"
+    },
+    "grpcMediaUploadRequest": {
+      "type": "object",
+      "properties": {
+        "FileName": {
+          "type": "string"
+        },
+        "Chunk": {
+          "type": "string",
+          "format": "byte"
+        }
+      }
     },
     "grpcNew": {
       "type": "object",

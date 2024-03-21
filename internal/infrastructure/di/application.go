@@ -3,6 +3,7 @@ package di
 import (
 	"github.com/sarulabs/di"
 	"grpc/internal/application"
+	appnewscommands "grpc/internal/application/news/commands"
 	appnews "grpc/internal/application/news/queries"
 	appusers "grpc/internal/application/users/queries"
 	"grpc/internal/domain/news"
@@ -19,13 +20,16 @@ var ApplicationServices = []di.Def{
 			transactor := ctn.Get("Database").(*db.Db)
 			repository := ctn.Get("NewsRepository").(news.RepositoryInterface)
 			authProvider := ctn.Get("AuthProvider").(interfaces.AuthProviderInterface)
+			fileStorageProvider := ctn.Get("FileStorageProvider").(interfaces.FileStorageProviderInterface)
 
 			return application.Handlers{
 				Queries: application.Queries{
 					GetList: appnews.NewGetListHandler(repository, transactor),
 					Login:   appusers.NewLoginHandler(authProvider),
 				},
-				Commands: application.Commands{},
+				Commands: application.Commands{
+					Create: appnewscommands.NewCreateHandler(repository, transactor, fileStorageProvider),
+				},
 			}, nil
 		},
 	},
@@ -36,9 +40,10 @@ var ApplicationServices = []di.Def{
 			dbx := ctn.Get("Database").(*db.Db)
 
 			return adapters.Services{
-				Database:       dbx,
-				NewsRepository: ctn.Get("NewsRepository").(news.RepositoryInterface),
-				AuthProvider:   ctn.Get("AuthProvider").(interfaces.AuthProviderInterface),
+				Database:            dbx,
+				NewsRepository:      ctn.Get("NewsRepository").(news.RepositoryInterface),
+				AuthProvider:        ctn.Get("AuthProvider").(interfaces.AuthProviderInterface),
+				FileStorageProvider: ctn.Get("FileStorageProvider").(interfaces.FileStorageProviderInterface),
 			}, nil
 		},
 	},

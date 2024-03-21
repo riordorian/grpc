@@ -17,7 +17,8 @@ func InitConfig() interfaces.ConfigProviderInterface {
 		panic(err.Error())
 	}
 
-	if appEnv := viper.Get("APP_PROFILE"); appEnv == "local" {
+	appEnv := viper.Get("APP_PROFILE")
+	if appEnv == "local" {
 		viper.Set("POSTGRES_HOST", viper.Get("POSTGRES_HOST_LOCAL"))
 	}
 	viper.SetDefault("POSTGRES_PORT", 5432)
@@ -34,6 +35,16 @@ func InitConfig() interfaces.ConfigProviderInterface {
 		viper.Get("POSTGRES_DB"),
 	)
 	viper.Set("POSTGRES_DSN", dbDsn)
+
+	minioHost := viper.Get("MINIO_HOST")
+	if appEnv == "local" {
+		minioHost = viper.Get("MINIO_HOST_LOCAL")
+	}
+
+	minioUrl := fmt.Sprintf(
+		"%s:%d", minioHost, viper.GetInt32("MINIO_PORT"),
+	)
+	viper.Set("MINIO_HOST", minioUrl)
 
 	return viper
 }

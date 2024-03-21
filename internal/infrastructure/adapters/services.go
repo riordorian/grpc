@@ -7,7 +7,8 @@ import (
 )
 
 type Services struct {
-	Database       *db.Db
-	NewsRepository news.RepositoryInterface
-	AuthProvider   interfaces.AuthProviderInterface
+	Database            *db.Db
+	NewsRepository      news.RepositoryInterface
+	AuthProvider        interfaces.AuthProviderInterface
+	FileStorageProvider interfaces.FileStorageProviderInterface
 }
