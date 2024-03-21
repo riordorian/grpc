@@ -7,11 +7,12 @@ GRPC server on golang using clean architecture.
 |-----------------|:--------------------------------------------:|
 | Database        |                  PostgreSQL                  |
 | DB driver       |                     Sqlx                     |
-| Config provider |                  [Viper](https://github.com/spf13/viper)                   |
+| Config provider |   [Viper](https://github.com/spf13/viper)    |
 | DI Container    |  [Sarulabs](https://github.com/sarulabs/di)  |
-| Logger |    [Zap](https://github.com/uber-go/zap)     |
-| Mocks | [Mockery](https://github.com/vektra/mockery) |
- | CLI commands |   [Cobra](https://github.com/spf13/cobra)    |
+| Logger          |    [Zap](https://github.com/uber-go/zap)     |
+| Mocks           | [Mockery](https://github.com/vektra/mockery) |
+ | CLI commands    |   [Cobra](https://github.com/spf13/cobra)    |
+| File storage    |   [Minio](https://min.io)    |
 
 
 ## Migrations
