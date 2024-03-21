@@ -55,7 +55,8 @@ func bootstrap() di.Container {
 		len(dic.RepositoryServices) +
 		len(dic.AuthServices) +
 		len(dic.ApplicationServices) +
-		len(dic.PortsServices)
+		len(dic.PortsServices) +
+		len(dic.FileStorage)
 
 	var defs = make([]di.Def, 0, c)
 	defs = append(defs, dic.ConfigServices...)
@@ -63,6 +64,8 @@ func bootstrap() di.Container {
 	defs = append(defs, dic.AuthServices...)
 	defs = append(defs, dic.ApplicationServices...)
 	defs = append(defs, dic.PortsServices...)
+	defs = append(defs, dic.FileStorage...)
+
 	builderErr = builder.Add(defs...)
 	if builderErr != nil {
 		log.Fatal(builderErr.Error())

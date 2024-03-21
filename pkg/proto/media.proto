@@ -17,3 +17,8 @@ message MediaItem {
   string Path = 3;
   MediaType Type = 4;
 }
+
+message MediaUploadRequest {
+  string FileName = 1;
+  bytes Chunk = 2;
+}

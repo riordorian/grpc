@@ -19,7 +19,8 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	News_List_FullMethodName = "/grpc.News/List"
+	News_List_FullMethodName   = "/grpc.News/List"
+	News_Create_FullMethodName = "/grpc.News/Create"
 )
 
 // NewsClient is the client API for News service.
@@ -27,6 +28,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type NewsClient interface {
 	List(ctx context.Context, in *ListRequest, opts ...grpc.CallOption) (*NewsList, error)
+	Create(ctx context.Context, opts ...grpc.CallOption) (News_CreateClient, error)
 }
 
 type newsClient struct {
@@ -46,11 +48,46 @@ func (c *newsClient) List(ctx context.Context, in *ListRequest, opts ...grpc.Cal
 	return out, nil
 }
 
+func (c *newsClient) Create(ctx context.Context, opts ...grpc.CallOption) (News_CreateClient, error) {
+	stream, err := c.cc.NewStream(ctx, &News_ServiceDesc.Streams[0], News_Create_FullMethodName, opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &newsCreateClient{stream}
+	return x, nil
+}
+
+type News_CreateClient interface {
+	Send(*CreateRequest) error
+	CloseAndRecv() (*CreateResponse, error)
+	grpc.ClientStream
+}
+
+type newsCreateClient struct {
+	grpc.ClientStream
+}
+
+func (x *newsCreateClient) Send(m *CreateRequest) error {
+	return x.ClientStream.SendMsg(m)
+}
+
+func (x *newsCreateClient) CloseAndRecv() (*CreateResponse, error) {
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	m := new(CreateResponse)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
 // NewsServer is the server API for News service.
 // All implementations must embed UnimplementedNewsServer
 // for forward compatibility
 type NewsServer interface {
 	List(context.Context, *ListRequest) (*NewsList, error)
+	Create(News_CreateServer) error
 	mustEmbedUnimplementedNewsServer()
 }
 
@@ -60,6 +97,9 @@ type UnimplementedNewsServer struct {
 
 func (UnimplementedNewsServer) List(context.Context, *ListRequest) (*NewsList, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method List not implemented")
+}
+func (UnimplementedNewsServer) Create(News_CreateServer) error {
+	return status.Errorf(codes.Unimplemented, "method Create not implemented")
 }
 func (UnimplementedNewsServer) mustEmbedUnimplementedNewsServer() {}
 
@@ -92,6 +132,32 @@ func _News_List_Handler(srv interface{}, ctx context.Context, dec func(interface
 	return interceptor(ctx, in, info, handler)
 }
 
+func _News_Create_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(NewsServer).Create(&newsCreateServer{stream})
+}
+
+type News_CreateServer interface {
+	SendAndClose(*CreateResponse) error
+	Recv() (*CreateRequest, error)
+	grpc.ServerStream
+}
+
+type newsCreateServer struct {
+	grpc.ServerStream
+}
+
+func (x *newsCreateServer) SendAndClose(m *CreateResponse) error {
+	return x.ServerStream.SendMsg(m)
+}
+
+func (x *newsCreateServer) Recv() (*CreateRequest, error) {
+	m := new(CreateRequest)
+	if err := x.ServerStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
 // News_ServiceDesc is the grpc.ServiceDesc for News service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -104,6 +170,12 @@ var News_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _News_List_Handler,
 		},
 	},
-	Streams:  []grpc.StreamDesc{},
+	Streams: []grpc.StreamDesc{
+		{
+			StreamName:    "Create",
+			Handler:       _News_Create_Handler,
+			ClientStreams: true,
+		},
+	},
 	Metadata: "new.proto",
 }
