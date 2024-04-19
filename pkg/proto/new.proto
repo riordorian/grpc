@@ -51,7 +51,6 @@ message ListRequest {
   optional Status Status = 3;
   optional string Query = 4;
   optional int32 Page = 5;
-  string Token = 6;
 }
 
 // TODO: How to use uuid?

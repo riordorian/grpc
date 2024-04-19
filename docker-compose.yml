@@ -21,6 +21,8 @@ services:
     env_file: .env
     ports:
       - "5432:5432"
+    volumes:
+      - .volumes/db:/var/lib/postgresql/data
   minio:
     image: quay.io/minio/minio
     command: server /data --console-address ":9090"
@@ -49,8 +51,14 @@ services:
       - start-dev
       - --import-realm
     env_file: .env
+    restart: unless-stopped
+    environment:
+      - KEYCLOAK_ADMIN=grpc
+      - KEYCLOAK_ADMIN_PASSWORD=grpc
     ports:
       - "8082:8080"
+    volumes:
+      - .volumes/keycloak/:/opt/keycloak/data/
 #  krakend:
 #    image: devopsfaith/krakend:watch
 #    volumes:
