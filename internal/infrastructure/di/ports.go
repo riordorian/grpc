@@ -30,7 +30,10 @@ var PortsServices = []di.Def{
 				log.Fatalf("failed to listen: %v", err)
 			}
 			authInterceptor := ctn.Get("AuthInterceptor").(interceptors.AuthInterceptor)
-			server := gpc.NewServer(gpc.ChainUnaryInterceptor(authInterceptor.Get()))
+			server := gpc.NewServer(
+				gpc.ChainUnaryInterceptor(authInterceptor.Get()),
+				gpc.ChainStreamInterceptor(authInterceptor.GetStream()),
+			)
 			s := &grpc.NewsServer{
 				Server:   server,
 				Listener: lis,

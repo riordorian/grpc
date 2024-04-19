@@ -117,7 +117,6 @@ func (k Keycloak) Can(action string, token string) (bool, error) {
 	}
 
 	return false, errors.New("action is not allowed")
-
 }
 
 func (k Keycloak) sendRequest(req *http.Request, v interface{}) error {

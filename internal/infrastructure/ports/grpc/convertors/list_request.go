@@ -13,7 +13,6 @@ type ListRequestConvertorInterface interface {
 type ListRequestConvertor struct {
 }
 
-// TODO: Is it correct way to modify params here? Or should it be in the paramsRelolver like symfony?
 func (l ListRequestConvertor) Convert(req *pg.ListRequest) (dto.ListRequest, error) {
 	page := *req.Page
 	if page == 0 {
