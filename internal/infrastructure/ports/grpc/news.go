@@ -2,10 +2,9 @@ package grpc
 
 import (
 	"context"
-	"fmt"
 	"grpc/pkg/proto_gen/grpc"
 	"io"
-	"os"
+	"log"
 )
 
 func (s NewsServer) List(ctx context.Context, req *grpc.ListRequest) (*grpc.NewsList, error) {
@@ -23,25 +22,15 @@ func (s NewsServer) List(ctx context.Context, req *grpc.ListRequest) (*grpc.News
 }
 
 func (s NewsServer) Create(stream grpc.News_CreateServer) error {
-	for {
-		req, err := stream.Recv()
+	req, err := stream.Recv()
+	if err == io.EOF {
+		return nil
+	}
 
-		if err == io.EOF {
-			break
-		}
-
-		media := req.GetMedia()
-
-		for i := range media {
-			file, err := os.Create(media[i].GetFileName())
-			if err != nil {
-				fmt.Println("Error creating file:", err)
-				return err
-			}
-			file.Write(media[i].GetChunk())
-			//fmt.Println(media[i].GetChunk())
-		}
-
+	//createRequest, err := s.Convertors.CreateRequest.Convert(req)
+	_, err = s.Convertors.CreateRequest.Convert(req)
+	if err != nil {
+		log.Fatal(err.Error())
 	}
 
 	_, createErr := s.Handlers.Commands.Create.Handle("created.png")

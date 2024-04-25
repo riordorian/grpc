@@ -14,6 +14,7 @@ import (
 type Convertors struct {
 	ListRequest   convertors.ListRequestConvertorInterface
 	ListResponse  convertors.ListResponseConvertorInterface
+	CreateRequest convertors.CreateRequestConvertorInterface
 	LoginRequest  convertors.UserLoginRequestConvertorInterface
 	LoginResponse convertors.UserLoginResponseConvertorInterface
 }

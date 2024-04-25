@@ -62,7 +62,7 @@ message InfoRequest {
 message CreateRequest {
   string Title = 1;
   string Text = 2;
-  optional string Tags = 5;
+  repeated string Tags = 5;
   repeated MediaUploadRequest Media = 6;
 }
 

@@ -13,3 +13,9 @@ type ListRequest struct {
 	Query  string
 	Page   int32
 }
+
+type CreateRequest struct {
+	Text  string
+	Title string
+	Tags  []string
+}
