@@ -6,12 +6,12 @@ import (
 )
 
 type ListResponseConvertorInterface interface {
-	Convert([]news.New) *grpc.NewsList
+	Convert([]news.News) *grpc.NewsList
 }
 type ListResponseConvertor struct {
 }
 
-func (l ListResponseConvertor) Convert(list []news.New) *grpc.NewsList {
+func (l ListResponseConvertor) Convert(list []news.News) *grpc.NewsList {
 	var newDto *grpc.New
 	var newsList []*grpc.New
 

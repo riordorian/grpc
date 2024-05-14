@@ -27,13 +27,12 @@ func (s NewsServer) Create(stream grpc.News_CreateServer) error {
 		return nil
 	}
 
-	//createRequest, err := s.Convertors.CreateRequest.Convert(req)
-	_, err = s.Convertors.CreateRequest.Convert(req)
+	createRequest, err := s.Convertors.CreateRequest.Convert(req)
 	if err != nil {
 		log.Fatal(err.Error())
 	}
 
-	_, createErr := s.Handlers.Commands.Create.Handle("created.png")
+	createErr := s.Handlers.Commands.Create.Handle(context.Background(), createRequest)
 	if createErr != nil {
 		return createErr
 	}

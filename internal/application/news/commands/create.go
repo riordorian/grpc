@@ -1,9 +1,13 @@
 package commands
 
 import (
-	"fmt"
+	"context"
+	"github.com/google/uuid"
 	"grpc/internal/application/storage"
 	"grpc/internal/domain/news"
+	"grpc/internal/shared"
+	"grpc/internal/shared/dto"
+
 	//"grpc/internal/shared/dto"
 	"grpc/internal/shared/interfaces"
 )
@@ -15,7 +19,7 @@ type CreateHandler struct {
 }
 
 type CreateHandlerInterface interface {
-	Handle(req string) ([]news.New, error)
+	Handle(ctx context.Context, req dto.CreateRequest) error
 }
 
 func NewCreateHandler(repo news.RepositoryInterface,
@@ -28,38 +32,37 @@ func NewCreateHandler(repo news.RepositoryInterface,
 	}
 }
 
-func (c CreateHandler) Handle(req string) ([]news.New, error) {
-	if err := c.FileStorage.Upload("created.png", req); err != nil {
-		return nil, err
+func (c CreateHandler) Handle(ctx context.Context, req dto.CreateRequest) error {
+	var media []shared.Media
+	for i := range req.Media {
+		err := c.FileStorage.UploadMediaFromStream(req.Media[i])
+		if err != nil {
+			return err
+		}
+		mediaItem := shared.GetMediaInstanceByPath(req.Media[i].GetFileName())
+		media = append(media, mediaItem)
 	}
-	/*err := l.Transactor.MakeTransaction(ctx, func(ctx context.Context) error {
+
+	err := c.Transactor.MakeTransaction(ctx, func(ctx context.Context) error {
 		id, _ := uuid.Parse("44266dc6-18d0-46bd-a2b5-238de53db2cb")
-		new := news.New{
-			Title:     "New 5",
-			Text:      "New 5 text",
+		newItem := news.News{
+			Title:     req.Title,
+			Text:      req.Text,
 			Status:    1,
 			CreatedBy: id,
+			Media:     media,
 		}
-		_, err := l.Repo.Insert(ctx, new)
+		_, err := c.Repo.Insert(ctx, newItem)
 		if err != nil {
 			return err
 		}
 
-		new2 := news.New{
-			Title:     "New 6",
-			Text:      "New 6 text",
-			Status:    1,
-			CreatedBy: id,
-		}
-		_, err2 := l.Repo.Insert(ctx, new2)
-		if err2 != nil {
-			return err2
-		}
 		return nil
-	})*/
+	})
 
-	fmt.Println(123)
-	var list []news.New
+	if err != nil {
+		return err
+	}
 
-	return list, nil
+	return nil
 }

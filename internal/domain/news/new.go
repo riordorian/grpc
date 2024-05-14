@@ -14,7 +14,7 @@ const (
 	DRAFT
 )
 
-type New struct {
+type News struct {
 	Id          uuid.UUID  `json:"id" db:"id"`
 	Title       string     `json:"title" db:"title"`
 	Text        string     `json:"text" db:"text"`

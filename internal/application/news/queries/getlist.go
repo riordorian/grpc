@@ -13,7 +13,7 @@ type ListHandler struct {
 }
 
 type GetListHandlerInterface interface {
-	Handle(ctx context.Context, req dto.ListRequest) ([]news.New, error)
+	Handle(ctx context.Context, req dto.ListRequest) ([]news.News, error)
 }
 
 func NewGetListHandler(repo news.RepositoryInterface, t storage.TransactorInterface) GetListHandlerInterface {
@@ -23,7 +23,7 @@ func NewGetListHandler(repo news.RepositoryInterface, t storage.TransactorInterf
 	}
 }
 
-func (l ListHandler) Handle(ctx context.Context, req dto.ListRequest) ([]news.New, error) {
+func (l ListHandler) Handle(ctx context.Context, req dto.ListRequest) ([]news.News, error) {
 	/*err := l.Transactor.MakeTransaction(ctx, func(ctx context.Context) error {
 		id, _ := uuid.Parse("44266dc6-18d0-46bd-a2b5-238de53db2cb")
 		new := news.New{
