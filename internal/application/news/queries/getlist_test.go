@@ -5,6 +5,7 @@ import (
 	"errors"
 	"grpc/internal/application/storage"
 	"grpc/internal/domain/news"
+	"grpc/internal/domain/repository"
 	"grpc/internal/shared/dto"
 	"grpc/pkg/mocks"
 	"reflect"
@@ -13,7 +14,7 @@ import (
 
 func TestListHandler_Handle(t *testing.T) {
 	type fields struct {
-		Repo       news.RepositoryInterface
+		Repo       repository.NewsRepositoryInterface
 		Transactor storage.TransactorInterface
 	}
 	type args struct {
@@ -30,19 +31,19 @@ func TestListHandler_Handle(t *testing.T) {
 		Page: -1,
 	}
 
-	repo.EXPECT().GetList(ctx, emptyRequest).RunAndReturn(func(ctx context.Context, request dto.ListRequest) ([]news.New, error) {
-		return []news.New{}, nil
+	repo.EXPECT().GetList(ctx, emptyRequest).RunAndReturn(func(ctx context.Context, request dto.ListRequest) ([]news.News, error) {
+		return []news.News{}, nil
 	})
 	repo.EXPECT().GetList(ctx, invalidRequest).RunAndReturn(
-		func(ctx context.Context, request dto.ListRequest) ([]news.New, error) {
-			return []news.New{}, errors.New("invalid request")
+		func(ctx context.Context, request dto.ListRequest) ([]news.News, error) {
+			return []news.News{}, errors.New("invalid request")
 		})
 
 	tests := []struct {
 		name    string
 		fields  fields
 		args    args
-		want    []news.New
+		want    []news.News
 		wantErr bool
 	}{
 		{
@@ -55,7 +56,7 @@ func TestListHandler_Handle(t *testing.T) {
 				ctx: context.Background(),
 				req: emptyRequest,
 			},
-			want:    []news.New{},
+			want:    []news.News{},
 			wantErr: false,
 		},
 		{

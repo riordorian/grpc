@@ -11,11 +11,6 @@ import (
 	"strings"
 )
 
-// TODO: Code of connect/close methods duplicated on each repository
-
-// Идея такая - на уровне адаптера создаю новую структуру транзактора, в которой будет осуществляться подключение к бд, закрытие соединения и указание на использование транзакций
-// Возвращаться будет
-
 type NewsRepository struct {
 	Db *db.Db
 }
@@ -82,12 +77,17 @@ func (r NewsRepository) Insert(ctx context.Context, fields news.News) (uuid.UUID
 		"media":      media,
 	}
 
-	sql := "INSERT INTO news (title, text, created_by, status, media) VALUES (:title, :text, :created_by, :status, :media)"
-	_, err = r.Db.NamedExec(ctx, sql, queryFields)
+	var uid uuid.UUID
+	sql := "INSERT INTO news (title, text, created_by, status, media) VALUES (:title, :text, :created_by, :status, :media) RETURNING id"
+	preparedQuery, err := r.Db.PrepareNamed(sql)
+	if err != nil {
+		return uuid.Nil, err
+	}
+	err = preparedQuery.Get(&uid, queryFields)
 	if err != nil {
 		return uuid.New(), err
 	}
-	return uuid.New(), nil
+	return uid, nil
 }
 
 func (NewsRepository) Update(id uuid.UUID, fields news.News) (bool, error) {

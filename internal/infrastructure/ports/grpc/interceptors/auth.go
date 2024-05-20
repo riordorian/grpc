@@ -17,14 +17,10 @@ func (a AuthInterceptor) Get() gp.UnaryServerInterceptor {
 	return func(ctx context.Context, req any, info *gp.UnaryServerInfo, handler gp.UnaryHandler) (resp any, err error) {
 
 		if a.needAuth(info.FullMethod) {
-			md, ok := metadata.FromIncomingContext(ctx)
-			if !ok {
-				return nil, errors.New("no metadata")
+			bearerToken, err := a.GetTokenFromContext(ctx)
+			if err != nil {
+				return nil, err
 			}
-			bearer := md["authorization"]
-			bearerToken := bearer[0]
-			bearerToken = strings.TrimPrefix(bearerToken, "Bearer ")
-
 			if err := a.authorize(bearerToken); err != nil {
 				return nil, err
 			}
@@ -49,23 +45,29 @@ func (a AuthInterceptor) GetStream() gp.StreamServerInterceptor {
 		handler gp.StreamHandler,
 	) error {
 		//b := ss.RecvMsg(grpc.CreateRequest.ProtoMessage)
-		//fmt.Println(b)
 		if a.needAuth(info.FullMethod) {
-			/*if err := a.authorize(req.(*grpc.ListRequest).GetToken()); err != nil {
+			ctx := ss.Context()
+			token, err := a.GetTokenFromContext(ctx)
+			if err != nil {
 				return err
-			}*/
+			}
 
-			/*can, err := a.can(info.FullMethod, req.(*grpc.ListRequest).GetToken())
+			if err := a.authorize(token); err != nil {
+				return err
+			}
+
+			can, err := a.can(info.FullMethod, token)
 			if !can || err != nil {
 				return err
-			}*/
-			ctx := ss.Context()
-			err := handler(srv, &serverStream{ServerStream: ss, newCtx: ctx})
-			return err
-			//wrapped.validator = validator
-			//wrapped.options = evaluateOpts(opts)
+			}
 
-			//return handler(srv, ss)
+			userId, err := a.AuthProvider.GetUserIdByToken(token)
+			if err != nil {
+				return err
+			}
+
+			err = handler(srv, &serverStream{ServerStream: ss, newCtx: context.WithValue(ctx, "userId", userId)})
+			return err
 		}
 
 		return handler(srv, ss)
@@ -116,4 +118,16 @@ func (a AuthInterceptor) authorize(token string) error {
 
 func (a AuthInterceptor) can(action string, token string) (bool, error) {
 	return a.AuthProvider.Can(action, token)
+}
+
+func (a AuthInterceptor) GetTokenFromContext(ctx context.Context) (string, error) {
+	md, ok := metadata.FromIncomingContext(ctx)
+	if !ok {
+		return "", errors.New("no metadata")
+	}
+	bearer := md["authorization"]
+	bearerToken := bearer[0]
+	bearerToken = strings.TrimPrefix(bearerToken, "Bearer ")
+
+	return bearerToken, nil
 }

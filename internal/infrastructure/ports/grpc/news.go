@@ -32,7 +32,7 @@ func (s NewsServer) Create(stream grpc.News_CreateServer) error {
 		log.Fatal(err.Error())
 	}
 
-	createErr := s.Handlers.Commands.Create.Handle(context.Background(), createRequest)
+	createErr := s.Handlers.Commands.Create.Handle(stream.Context(), createRequest)
 	if createErr != nil {
 		return createErr
 	}

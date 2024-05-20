@@ -5,13 +5,14 @@ import (
 	appnews "grpc/internal/application/news/queries"
 	"grpc/internal/application/storage"
 	appusers "grpc/internal/application/users/queries"
-	"grpc/internal/domain/news"
+	"grpc/internal/domain/repository"
 	"grpc/internal/shared/interfaces"
 )
 
 type Services struct {
 	//Handler    appnews.ListHandler
-	Repository          news.RepositoryInterface
+	NewsRepository      repository.NewsRepositoryInterface
+	TagsRepository      repository.TagsRepositoryInterface
 	Transactor          storage.TransactorInterface
 	Handlers            Handlers
 	AuthProvider        interfaces.AuthProviderInterface

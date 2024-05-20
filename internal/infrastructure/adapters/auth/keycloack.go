@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/golang-jwt/jwt"
+	"github.com/google/uuid"
 	"log"
 	"net/http"
 	urlpack "net/url"
@@ -149,4 +150,26 @@ func (k Keycloak) sendRequest(req *http.Request, v interface{}) error {
 	}
 
 	return nil
+}
+
+func (k Keycloak) GetUserIdByToken(token string) (uuid.UUID, error) {
+	accessToken, claims, err := k.parseToken(token)
+	if !accessToken.Valid || err != nil {
+		return uuid.Nil, errors.New("jwt is not valid")
+	}
+
+	if !accessToken.Valid || err != nil {
+		return uuid.Nil, errors.New("jwt is not valid")
+	}
+
+	if len(claims["sub"].(string)) > 0 {
+		userId, err := uuid.Parse(claims["sub"].(string))
+		if err != nil {
+			return uuid.Nil, err
+		}
+
+		return userId, nil
+	}
+
+	return uuid.Nil, nil
 }

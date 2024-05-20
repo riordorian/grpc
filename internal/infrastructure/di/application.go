@@ -6,7 +6,7 @@ import (
 	appnewscommands "grpc/internal/application/news/commands"
 	appnews "grpc/internal/application/news/queries"
 	appusers "grpc/internal/application/users/queries"
-	"grpc/internal/domain/news"
+	"grpc/internal/domain/repository"
 	"grpc/internal/infrastructure/adapters"
 	"grpc/internal/infrastructure/db"
 	"grpc/internal/shared/interfaces"
@@ -18,17 +18,18 @@ var ApplicationServices = []di.Def{
 		Scope: di.App,
 		Build: func(ctn di.Container) (interface{}, error) {
 			transactor := ctn.Get("Database").(*db.Db)
-			repository := ctn.Get("NewsRepository").(news.RepositoryInterface)
+			newsRepository := ctn.Get("NewsRepository").(repository.NewsRepositoryInterface)
+			tagsRepository := ctn.Get("TagsRepository").(repository.TagsRepositoryInterface)
 			authProvider := ctn.Get("AuthProvider").(interfaces.AuthProviderInterface)
 			fileStorageProvider := ctn.Get("FileStorageProvider").(interfaces.FileStorageProviderInterface)
 
 			return application.Handlers{
 				Queries: application.Queries{
-					GetList: appnews.NewGetListHandler(repository, transactor),
+					GetList: appnews.NewGetListHandler(newsRepository, transactor),
 					Login:   appusers.NewLoginHandler(authProvider),
 				},
 				Commands: application.Commands{
-					Create: appnewscommands.NewCreateHandler(repository, transactor, fileStorageProvider),
+					Create: appnewscommands.NewCreateHandler(newsRepository, tagsRepository, transactor, fileStorageProvider),
 				},
 			}, nil
 		},
@@ -41,7 +42,8 @@ var ApplicationServices = []di.Def{
 
 			return adapters.Services{
 				Database:            dbx,
-				NewsRepository:      ctn.Get("NewsRepository").(news.RepositoryInterface),
+				NewsRepository:      ctn.Get("NewsRepository").(repository.NewsRepositoryInterface),
+				TagsRepository:      ctn.Get("TagsRepository").(repository.TagsRepositoryInterface),
 				AuthProvider:        ctn.Get("AuthProvider").(interfaces.AuthProviderInterface),
 				FileStorageProvider: ctn.Get("FileStorageProvider").(interfaces.FileStorageProviderInterface),
 			}, nil

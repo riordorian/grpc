@@ -4,11 +4,12 @@ import (
 	"context"
 	"grpc/internal/application/storage"
 	"grpc/internal/domain/news"
+	"grpc/internal/domain/repository"
 	"grpc/internal/shared/dto"
 )
 
 type ListHandler struct {
-	Repo       news.RepositoryInterface
+	Repo       repository.NewsRepositoryInterface
 	Transactor storage.TransactorInterface
 }
 
@@ -16,7 +17,7 @@ type GetListHandlerInterface interface {
 	Handle(ctx context.Context, req dto.ListRequest) ([]news.News, error)
 }
 
-func NewGetListHandler(repo news.RepositoryInterface, t storage.TransactorInterface) GetListHandlerInterface {
+func NewGetListHandler(repo repository.NewsRepositoryInterface, t storage.TransactorInterface) GetListHandlerInterface {
 	return ListHandler{
 		Repo:       repo,
 		Transactor: t,
