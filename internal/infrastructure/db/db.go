@@ -56,6 +56,7 @@ func (d *Db) Close() error {
 	return d.dbx.Close()
 }
 
+// TODO: Test for error case in MakeTransaction. It should not insert any data to the database
 func (d *Db) MakeTransaction(ctx context.Context, tFunc func(ctx context.Context) error) error {
 	// begin transaction
 	tx, err := d.dbx.Beginx()
@@ -130,4 +131,7 @@ func (d *Db) NamedExec(ctx context.Context, query string, arg interface{}) (sql.
 }
 func (d *Db) NamedQuery(ctx context.Context, query string, arg interface{}) (*sqlx.Rows, error) {
 	return d.Model(ctx).NamedQuery(query, arg)
+}
+func (d *Db) PrepareNamed(query string) (*sqlx.NamedStmt, error) {
+	return d.dbx.PrepareNamed(query)
 }

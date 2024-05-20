@@ -251,7 +251,10 @@
           "type": "string"
         },
         "Tags": {
-          "type": "string"
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         },
         "Media": {
           "type": "array",

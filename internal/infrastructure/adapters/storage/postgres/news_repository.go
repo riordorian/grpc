@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"context"
+	"encoding/json"
 	"github.com/google/uuid"
 	_ "github.com/jackc/pgx/stdlib"
 	"grpc/internal/domain/news"
@@ -10,19 +11,14 @@ import (
 	"strings"
 )
 
-// TODO: Code of connect/close methods duplicated on each repository
-
-// Идея такая - на уровне адаптера создаю новую структуру транзактора, в которой будет осуществляться подключение к бд, закрытие соединения и указание на использование транзакций
-// Возвращаться будет
-
 type NewsRepository struct {
 	Db *db.Db
 }
 
 // TODO: Is it correct to use structure from Domain layer
 
-func (r NewsRepository) GetList(ctx context.Context, req dto.ListRequest) ([]news.New, error) {
-	var result []news.New
+func (r NewsRepository) GetList(ctx context.Context, req dto.ListRequest) ([]news.News, error) {
+	var result []news.News
 
 	query := map[string]interface{}{
 		"sort":   req.Sort,
@@ -52,7 +48,7 @@ func (r NewsRepository) GetList(ctx context.Context, req dto.ListRequest) ([]new
 		return nil, err
 	}
 
-	var newItem news.New
+	var newItem news.News
 	for rows.Next() {
 		if errScan := rows.StructScan(&newItem); err != nil {
 			return nil, errScan
@@ -64,20 +60,37 @@ func (r NewsRepository) GetList(ctx context.Context, req dto.ListRequest) ([]new
 	return result, nil
 }
 
-func (NewsRepository) GetById(uuid uuid.UUID) (news.New, error) {
-	return news.New{}, nil
+func (NewsRepository) GetById(uuid uuid.UUID) (news.News, error) {
+	return news.News{}, nil
 }
 
-func (r NewsRepository) Insert(ctx context.Context, fields news.New) (uuid.UUID, error) {
-	sql := "INSERT INTO news (title, text, created_by, status) VALUES (:title, :text, :created_by, :status)"
-	_, err := r.Db.NamedExec(ctx, sql, fields)
+func (r NewsRepository) Insert(ctx context.Context, fields news.News) (uuid.UUID, error) {
+	media, err := json.Marshal(fields.Media)
+	if err != nil {
+		return uuid.Nil, err
+	}
+	queryFields := map[string]interface{}{
+		"title":      fields.Title,
+		"text":       fields.Text,
+		"created_by": fields.CreatedBy,
+		"status":     fields.Status,
+		"media":      media,
+	}
+
+	var uid uuid.UUID
+	sql := "INSERT INTO news (title, text, created_by, status, media) VALUES (:title, :text, :created_by, :status, :media) RETURNING id"
+	preparedQuery, err := r.Db.PrepareNamed(sql)
+	if err != nil {
+		return uuid.Nil, err
+	}
+	err = preparedQuery.Get(&uid, queryFields)
 	if err != nil {
 		return uuid.New(), err
 	}
-	return uuid.New(), nil
+	return uid, nil
 }
 
-func (NewsRepository) Update(id uuid.UUID, fields news.New) (bool, error) {
+func (NewsRepository) Update(id uuid.UUID, fields news.News) (bool, error) {
 	return false, nil
 }
 

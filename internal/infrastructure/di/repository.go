@@ -36,4 +36,13 @@ var RepositoryServices = []di.Def{
 			}, nil
 		},
 	},
+	{
+		Name:  "TagsRepository",
+		Scope: di.App,
+		Build: func(ctn di.Container) (interface{}, error) {
+			return postgres.TagsRepository{
+				Db: ctn.Get("Database").(*db.Db),
+			}, nil
+		},
+	},
 }

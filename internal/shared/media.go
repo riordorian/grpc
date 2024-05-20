@@ -1,6 +1,6 @@
 package shared
 
-import "github.com/google/uuid"
+import "path/filepath"
 
 type MediaType int
 
@@ -11,8 +11,20 @@ const (
 )
 
 type Media struct {
-	Id   uuid.UUID
 	Name string
 	Path string
 	Type MediaType
+}
+
+func GetMediaInstanceByPath(path string) Media {
+	filename := path
+	base := filepath.Base(filename)
+	extension := filepath.Ext(base)
+	filenameWithoutExt := base[0 : len(base)-len(extension)]
+
+	return Media{
+		Name: filenameWithoutExt,
+		Path: path,
+		Type: 0,
+	}
 }

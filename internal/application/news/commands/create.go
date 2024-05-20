@@ -1,65 +1,79 @@
 package commands
 
 import (
-	"fmt"
+	"context"
+	"github.com/google/uuid"
 	"grpc/internal/application/storage"
 	"grpc/internal/domain/news"
+	"grpc/internal/domain/repository"
+	"grpc/internal/shared"
+	"grpc/internal/shared/dto"
+
 	//"grpc/internal/shared/dto"
 	"grpc/internal/shared/interfaces"
 )
 
 type CreateHandler struct {
-	Repo        news.RepositoryInterface
+	NewsRepo    repository.NewsRepositoryInterface
+	TagsRepo    repository.TagsRepositoryInterface
 	Transactor  storage.TransactorInterface
 	FileStorage interfaces.FileStorageProviderInterface
 }
 
 type CreateHandlerInterface interface {
-	Handle(req string) ([]news.New, error)
+	Handle(ctx context.Context, req dto.CreateRequest) error
 }
 
-func NewCreateHandler(repo news.RepositoryInterface,
+func NewCreateHandler(newsRepo repository.NewsRepositoryInterface,
+	tagsRepo repository.TagsRepositoryInterface,
 	t storage.TransactorInterface,
 	f interfaces.FileStorageProviderInterface) CreateHandlerInterface {
 	return CreateHandler{
-		Repo:        repo,
+		NewsRepo:    newsRepo,
+		TagsRepo:    tagsRepo,
 		Transactor:  t,
 		FileStorage: f,
 	}
 }
 
-func (c CreateHandler) Handle(req string) ([]news.New, error) {
-	if err := c.FileStorage.Upload("created.png", req); err != nil {
-		return nil, err
-	}
-	/*err := l.Transactor.MakeTransaction(ctx, func(ctx context.Context) error {
-		id, _ := uuid.Parse("44266dc6-18d0-46bd-a2b5-238de53db2cb")
-		new := news.New{
-			Title:     "New 5",
-			Text:      "New 5 text",
-			Status:    1,
-			CreatedBy: id,
+func (c CreateHandler) Handle(ctx context.Context, req dto.CreateRequest) error {
+	var media []shared.Media
+	userId, _ := ctx.Value("userId").(uuid.UUID)
+	for i := range req.Media {
+		err := c.FileStorage.UploadMediaFromStream(req.Media[i])
+		if err != nil {
+			return err
 		}
-		_, err := l.Repo.Insert(ctx, new)
+		mediaItem := shared.GetMediaInstanceByPath(req.Media[i].GetFileName())
+		media = append(media, mediaItem)
+	}
+
+	err := c.Transactor.MakeTransaction(ctx, func(ctx context.Context) error {
+		newItem := news.News{
+			Title:     req.Title,
+			Text:      req.Text,
+			Status:    1,
+			CreatedBy: userId,
+			Media:     media,
+		}
+		createdNewsId, err := c.NewsRepo.Insert(ctx, newItem)
 		if err != nil {
 			return err
 		}
 
-		new2 := news.New{
-			Title:     "New 6",
-			Text:      "New 6 text",
-			Status:    1,
-			CreatedBy: id,
+		if len(req.Tags) > 0 {
+			err = c.TagsRepo.AddNewsTags(ctx, createdNewsId, userId, req.Tags)
+			if err != nil {
+				return err
+			}
 		}
-		_, err2 := l.Repo.Insert(ctx, new2)
-		if err2 != nil {
-			return err2
-		}
+
 		return nil
-	})*/
+	})
 
-	fmt.Println(123)
-	var list []news.New
+	if err != nil {
+		return err
+	}
 
-	return list, nil
+	return nil
 }

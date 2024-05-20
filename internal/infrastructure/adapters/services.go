@@ -1,14 +1,15 @@
 package adapters
 
 import (
-	"grpc/internal/domain/news"
+	"grpc/internal/domain/repository"
 	"grpc/internal/infrastructure/db"
 	"grpc/internal/shared/interfaces"
 )
 
 type Services struct {
 	Database            *db.Db
-	NewsRepository      news.RepositoryInterface
+	NewsRepository      repository.NewsRepositoryInterface
+	TagsRepository      repository.TagsRepositoryInterface
 	AuthProvider        interfaces.AuthProviderInterface
 	FileStorageProvider interfaces.FileStorageProviderInterface
 }
