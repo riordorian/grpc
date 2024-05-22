@@ -59,6 +59,31 @@ services:
       - "8082:8080"
     volumes:
       - .volumes/keycloak/:/opt/keycloak/data/
+  elasticsearch:
+    image: elasticsearch:8.13.4
+    volumes:
+      - .docker/elasticsearch/config.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+      - .volumes/elasticsearch/data:/usr/share/elasticsearch/data/
+    environment:
+      ES_JAVA_OPTS: "-Xmx512m -Xms512m"
+      ELASTIC_USERNAME: "elastic"
+      ELASTIC_PASSWORD: "MyPw123"
+      discovery.type: single-node
+    networks:
+      - elk
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+  kibana:
+    image: kibana:8.13.4
+    depends_on:
+      - elasticsearch
+    volumes:
+      - .docker/kibana/config.yml:/usr/share/kibana/config/kibana.yml
+    networks:
+      - elk
+    ports:
+      - "5601:5601"
 #  krakend:
 #    image: devopsfaith/krakend:watch
 #    volumes:
@@ -66,3 +91,7 @@ services:
 #    ports:
 #      - "8080:8080"
 #    command: [ "run", "-dc", "krakend.json" ]
+
+networks:
+  elk:
+    driver: bridge
