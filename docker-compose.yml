@@ -60,30 +60,45 @@ services:
     volumes:
       - .volumes/keycloak/:/opt/keycloak/data/
   elasticsearch:
+    container_name: elasticsearch
     image: elasticsearch:8.13.4
-    volumes:
-      - .docker/elasticsearch/config.yml:/usr/share/elasticsearch/config/elasticsearch.yml
-      - .volumes/elasticsearch/data:/usr/share/elasticsearch/data/
-    environment:
-      ES_JAVA_OPTS: "-Xmx512m -Xms512m"
-      ELASTIC_USERNAME: "elastic"
-      ELASTIC_PASSWORD: "MyPw123"
-      discovery.type: single-node
-    networks:
-      - elk
+    # 8.x
+    environment: [ 'CLI_JAVA_OPTS=-Xms2g -Xmx2g','bootstrap.memory_lock=true','discovery.type=single-node','xpack.security.enabled=false', 'xpack.security.enrollment.enabled=false' ]
     ports:
       - "9200:9200"
-      - "9300:9300"
+    networks:
+      - elastic
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+        reservations:
+          cpus: '1.0'
+    volumes:
+      - .volumes/elasticsearch:/usr/share/elasticsearch/data
+
   kibana:
     image: kibana:8.13.4
-    depends_on:
-      - elasticsearch
-    volumes:
-      - .docker/kibana/config.yml:/usr/share/kibana/config/kibana.yml
-    networks:
-      - elk
+    container_name: kibana
+    environment:
+      XPACK_ENCRYPTEDSAVEDOBJECTS_ENCRYPTIONKEY: "d1a66dfd-c4d3-4a0a-8290-2abcb83ab3aa"
     ports:
       - "5601:5601"
+    networks:
+      - elastic
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+        reservations:
+          cpus: '1.0'
 #  krakend:
 #    image: devopsfaith/krakend:watch
 #    volumes:
@@ -93,5 +108,4 @@ services:
 #    command: [ "run", "-dc", "krakend.json" ]
 
 networks:
-  elk:
-    driver: bridge
+  elastic:
