@@ -57,15 +57,37 @@ func (e ElasticAdapter) DeleteDocument(index string, id uuid.UUID) (*search.Resp
 	}, err
 }
 
-func (e ElasticAdapter) Search(index string, queryString string) (*search.Response, error) {
-	/*query := `{ "query": { "match_all": {} } }`
-	res, err := e.Client.Search(index, e.Client.Search.WithBody(bytes.NewReader([]byte(query)))
+func (e ElasticAdapter) Search(index string, fieldName string, queryString string) (*search.Response, error) {
+	query := map[string]interface{}{
+		"query": map[string]interface{}{
+			"match": map[string]interface{}{
+				fieldName: queryString,
+			},
+		},
+	}
+	queryBytes, err := json.Marshal(query)
+	if err != nil {
+		return nil, err
+	}
 
-	return res, err*/
+	res, err := e.Client.Search(
+		e.Client.Search.WithIndex(index),
+		e.Client.Search.WithBody(bytes.NewReader(queryBytes)),
+	)
 
-	//	TODO: https://www.elastic.co/guide/en/elasticsearch/client/go-api/current/examples.html
-
-	return nil, nil
+	return &search.Response{
+		StatusCode: res.StatusCode,
+		Header:     res.Header,
+		Body:       res.Body,
+	}, err
 }
 
-//	TODO: Search by ID. https://www.elastic.co/guide/en/elasticsearch/client/go-api/current/examples.html
+func (e ElasticAdapter) SearchById(index string, id uuid.UUID) (*search.Response, error) {
+	res, err := e.Client.Get(index, id.String())
+
+	return &search.Response{
+		StatusCode: res.StatusCode,
+		Header:     res.Header,
+		Body:       res.Body,
+	}, err
+}

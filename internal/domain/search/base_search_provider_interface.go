@@ -17,6 +17,6 @@ type BaseSearchProviderInterface interface {
 	DeleteIndex(index []string) (*Response, error)
 	IndexDocument(index string, uuid uuid.UUID, document interface{}) (*Response, error)
 	DeleteDocument(index string, id uuid.UUID) (*Response, error)
-	Search(index string, query string) (*Response, error)
+	Search(index string, fieldName string, queryString string) (*Response, error)
 	SearchById(index string, id uuid.UUID) (*Response, error)
 }

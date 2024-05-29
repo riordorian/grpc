@@ -5,8 +5,10 @@ import (
 	"grpc/internal/application"
 	appnewscommands "grpc/internal/application/news/commands"
 	appnews "grpc/internal/application/news/queries"
+	appsearch "grpc/internal/application/search/queries"
 	appusers "grpc/internal/application/users/queries"
 	"grpc/internal/domain/repository"
+	"grpc/internal/domain/search"
 	"grpc/internal/infrastructure/adapters"
 	"grpc/internal/infrastructure/db"
 	"grpc/internal/shared/interfaces"
@@ -22,10 +24,12 @@ var ApplicationServices = []di.Def{
 			tagsRepository := ctn.Get("TagsRepository").(repository.TagsRepositoryInterface)
 			authProvider := ctn.Get("AuthProvider").(interfaces.AuthProviderInterface)
 			fileStorageProvider := ctn.Get("FileStorageProvider").(interfaces.FileStorageProviderInterface)
+			searchProvider := ctn.Get("SearchProvider").(search.BaseSearchProviderInterface)
 
 			return application.Handlers{
 				Queries: application.Queries{
 					GetList: appnews.NewGetListHandler(newsRepository, transactor),
+					Search:  appsearch.NewSearchHandler(searchProvider),
 					Login:   appusers.NewLoginHandler(authProvider),
 				},
 				Commands: application.Commands{
@@ -46,6 +50,7 @@ var ApplicationServices = []di.Def{
 				TagsRepository:      ctn.Get("TagsRepository").(repository.TagsRepositoryInterface),
 				AuthProvider:        ctn.Get("AuthProvider").(interfaces.AuthProviderInterface),
 				FileStorageProvider: ctn.Get("FileStorageProvider").(interfaces.FileStorageProviderInterface),
+				SearchProvider:      ctn.Get("SearchProvider").(search.BaseSearchProviderInterface),
 			}, nil
 		},
 	},
