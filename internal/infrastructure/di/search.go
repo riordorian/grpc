@@ -1,7 +1,6 @@
 package di
 
 import (
-	"fmt"
 	"github.com/elastic/go-elasticsearch/v8"
 	"github.com/sarulabs/di"
 	"github.com/spf13/viper"
@@ -14,7 +13,7 @@ var SearchServices = []di.Def{
 		Scope: di.App,
 		Build: func(c di.Container) (interface{}, error) {
 			config := c.Get("ConfigProvider").(*viper.Viper)
-			dsn := fmt.Sprintf("%s:%s", config.GetString("ELASTICSEARCH_HOST"), config.GetString("ELASTICSEARCH_PORT"))
+			dsn := config.GetString("ELASTIC_DSN")
 			client, err := elasticsearch.NewClient(elasticsearch.Config{
 				Addresses: []string{dsn},
 			})

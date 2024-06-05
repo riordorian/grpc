@@ -2,6 +2,7 @@ package queries
 
 import (
 	"context"
+	"fmt"
 	"grpc/internal/domain/search"
 )
 
@@ -21,8 +22,9 @@ func NewSearchHandler(s search.BaseSearchProviderInterface) SearchHandlerInterfa
 
 func (s SearchHandler) Handle(ctx context.Context, fieldName string, queryString string) (string, error) {
 
-	_, err := s.SearchProvider.Search("news", fieldName, queryString)
+	res, err := s.SearchProvider.Search("news", fieldName, queryString)
 
+	fmt.Println(res)
 	if err != nil {
 		return "", err
 	}

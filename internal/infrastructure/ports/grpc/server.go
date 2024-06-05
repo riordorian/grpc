@@ -12,25 +12,24 @@ import (
 )
 
 type Convertors struct {
-	ListRequest   convertors.ListRequestConvertorInterface
-	ListResponse  convertors.ListResponseConvertorInterface
-	CreateRequest convertors.CreateRequestConvertorInterface
-	LoginRequest  convertors.UserLoginRequestConvertorInterface
-	LoginResponse convertors.UserLoginResponseConvertorInterface
+	ListRequest    convertors.ListRequestConvertorInterface
+	ListResponse   convertors.ListResponseConvertorInterface
+	CreateRequest  convertors.CreateRequestConvertorInterface
+	LoginRequest   convertors.UserLoginRequestConvertorInterface
+	LoginResponse  convertors.UserLoginResponseConvertorInterface
+	SearchResponse convertors.SearchResponseConvertorInterface
 }
 
 type NewsServer struct {
 	grpc.UnimplementedNewsServer
 	grpc.UnimplementedUsersServer
+	grpc.UnimplementedSearchServer
 	Handlers   application.Handlers
 	Server     *gp.Server
 	Listener   net.Listener
 	Container  di.Container
 	Convertors Convertors
 }
-
-func (NewsServer) mustEmbedUnimplementedNewsServer()  {}
-func (NewsServer) mustEmbedUnimplementedUsersServer() {}
 
 func (s NewsServer) SetHandlers(handlers application.Handlers) {
 	s.Handlers = handlers

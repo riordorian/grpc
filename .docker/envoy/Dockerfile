@@ -21,7 +21,7 @@ WORKDIR /app
 RUN     apk add --no-cache protoc && \
         apk add protobuf-dev
 
-COPY    ./internal/infrastructure/ports/grpc/proto .
+COPY    ./pkg/proto .
 
 # build proto descriptor
 RUN     protoc --include_imports --include_source_info \

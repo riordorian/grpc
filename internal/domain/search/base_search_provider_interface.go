@@ -2,21 +2,14 @@ package search
 
 import (
 	"github.com/google/uuid"
-	"io"
-	"net/http"
+	"grpc/internal/shared/dto"
 )
 
-type Response struct {
-	StatusCode int
-	Header     http.Header
-	Body       io.ReadCloser
-}
-
 type BaseSearchProviderInterface interface {
-	CreateIndex(index string) (*Response, error)
-	DeleteIndex(index []string) (*Response, error)
-	IndexDocument(index string, uuid uuid.UUID, document interface{}) (*Response, error)
-	DeleteDocument(index string, id uuid.UUID) (*Response, error)
-	Search(index string, fieldName string, queryString string) (*Response, error)
-	SearchById(index string, id uuid.UUID) (*Response, error)
+	CreateIndex(index string) (*dto.SearchResponse, error)
+	DeleteIndex(index []string) (*dto.SearchResponse, error)
+	IndexDocument(index string, uuid uuid.UUID, document interface{}) (*dto.SearchResponse, error)
+	DeleteDocument(index string, id uuid.UUID) (*dto.SearchResponse, error)
+	Search(index string, fieldName string, queryString string) (*dto.SearchResponse, error)
+	SearchById(index string, id uuid.UUID) (*dto.SearchResponse, error)
 }

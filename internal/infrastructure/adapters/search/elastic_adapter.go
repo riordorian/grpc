@@ -5,34 +5,36 @@ import (
 	"encoding/json"
 	"github.com/elastic/go-elasticsearch/v8"
 	"github.com/google/uuid"
-	"grpc/internal/domain/search"
+	"grpc/internal/shared/dto"
+	"io"
+	"log"
 )
 
 type ElasticAdapter struct {
 	Client *elasticsearch.Client
 }
 
-func (e ElasticAdapter) CreateIndex(index string) (*search.Response, error) {
+func (e ElasticAdapter) CreateIndex(index string) (*dto.SearchResponse, error) {
 	res, err := e.Client.Indices.Create(index)
 
-	return &search.Response{
+	return &dto.SearchResponse{
 		StatusCode: res.StatusCode,
 		Header:     res.Header,
-		Body:       res.Body,
+		Body:       e.getBody(res.Body),
 	}, err
 }
 
-func (e ElasticAdapter) DeleteIndex(index []string) (*search.Response, error) {
+func (e ElasticAdapter) DeleteIndex(index []string) (*dto.SearchResponse, error) {
 	res, err := e.Client.Indices.Delete(index)
 
-	return &search.Response{
+	return &dto.SearchResponse{
 		StatusCode: res.StatusCode,
 		Header:     res.Header,
-		Body:       res.Body,
+		Body:       e.getBody(res.Body),
 	}, err
 }
 
-func (e ElasticAdapter) IndexDocument(index string, uuid uuid.UUID, document interface{}) (*search.Response, error) {
+func (e ElasticAdapter) IndexDocument(index string, uuid uuid.UUID, document interface{}) (*dto.SearchResponse, error) {
 	doc, err := json.Marshal(document)
 	if err != nil {
 		return nil, err
@@ -40,24 +42,24 @@ func (e ElasticAdapter) IndexDocument(index string, uuid uuid.UUID, document int
 	docId := uuid.String()
 	res, err := e.Client.Index(index, bytes.NewReader(doc), e.Client.Index.WithDocumentID(docId))
 
-	return &search.Response{
+	return &dto.SearchResponse{
 		StatusCode: res.StatusCode,
 		Header:     res.Header,
-		Body:       res.Body,
+		Body:       e.getBody(res.Body),
 	}, err
 }
 
-func (e ElasticAdapter) DeleteDocument(index string, id uuid.UUID) (*search.Response, error) {
+func (e ElasticAdapter) DeleteDocument(index string, id uuid.UUID) (*dto.SearchResponse, error) {
 	res, err := e.Client.Delete(index, id.String())
 
-	return &search.Response{
+	return &dto.SearchResponse{
 		StatusCode: res.StatusCode,
 		Header:     res.Header,
-		Body:       res.Body,
+		Body:       e.getBody(res.Body),
 	}, err
 }
 
-func (e ElasticAdapter) Search(index string, fieldName string, queryString string) (*search.Response, error) {
+func (e ElasticAdapter) Search(index string, fieldName string, queryString string) (*dto.SearchResponse, error) {
 	query := map[string]interface{}{
 		"query": map[string]interface{}{
 			"match": map[string]interface{}{
@@ -75,19 +77,34 @@ func (e ElasticAdapter) Search(index string, fieldName string, queryString strin
 		e.Client.Search.WithBody(bytes.NewReader(queryBytes)),
 	)
 
-	return &search.Response{
+	return &dto.SearchResponse{
 		StatusCode: res.StatusCode,
 		Header:     res.Header,
-		Body:       res.Body,
+		Body:       e.getBody(res.Body),
 	}, err
 }
 
-func (e ElasticAdapter) SearchById(index string, id uuid.UUID) (*search.Response, error) {
+func (e ElasticAdapter) SearchById(index string, id uuid.UUID) (*dto.SearchResponse, error) {
 	res, err := e.Client.Get(index, id.String())
 
-	return &search.Response{
+	return &dto.SearchResponse{
 		StatusCode: res.StatusCode,
 		Header:     res.Header,
-		Body:       res.Body,
+		Body:       e.getBody(res.Body),
 	}, err
+}
+
+func (e ElasticAdapter) getBody(body io.ReadCloser) string {
+	defer func() {
+		if err := body.Close(); err != nil {
+			log.Fatal(err.Error())
+		}
+	}()
+
+	resBody, err := io.ReadAll(body)
+	if err != nil {
+		return ""
+	}
+
+	return string(resBody)
 }

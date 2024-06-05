@@ -9,7 +9,6 @@ import (
 	appusers "grpc/internal/application/users/queries"
 	"grpc/internal/domain/repository"
 	"grpc/internal/domain/search"
-	"grpc/internal/infrastructure/adapters"
 	"grpc/internal/infrastructure/db"
 	"grpc/internal/shared/interfaces"
 )
@@ -35,22 +34,6 @@ var ApplicationServices = []di.Def{
 				Commands: application.Commands{
 					Create: appnewscommands.NewCreateHandler(newsRepository, tagsRepository, transactor, fileStorageProvider),
 				},
-			}, nil
-		},
-	},
-	{
-		Name:  "AdaptersServices",
-		Scope: di.App,
-		Build: func(ctn di.Container) (interface{}, error) {
-			dbx := ctn.Get("Database").(*db.Db)
-
-			return adapters.Services{
-				Database:            dbx,
-				NewsRepository:      ctn.Get("NewsRepository").(repository.NewsRepositoryInterface),
-				TagsRepository:      ctn.Get("TagsRepository").(repository.TagsRepositoryInterface),
-				AuthProvider:        ctn.Get("AuthProvider").(interfaces.AuthProviderInterface),
-				FileStorageProvider: ctn.Get("FileStorageProvider").(interfaces.FileStorageProviderInterface),
-				SearchProvider:      ctn.Get("SearchProvider").(search.BaseSearchProviderInterface),
 			}, nil
 		},
 	},

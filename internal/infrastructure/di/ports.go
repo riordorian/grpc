@@ -39,11 +39,12 @@ var PortsServices = []di.Def{
 				Listener: lis,
 				Handlers: ctn.Get("ApplicationHandlers").(application.Handlers),
 				Convertors: grpc.Convertors{
-					ListRequest:   new(convertors.ListRequestConvertor),
-					ListResponse:  new(convertors.ListResponseConvertor),
-					CreateRequest: new(convertors.CreateRequestConvertor),
-					LoginRequest:  new(convertors.UserLoginRequestConvertor),
-					LoginResponse: new(convertors.UserLoginResponseConvertor),
+					ListRequest:    new(convertors.ListRequestConvertor),
+					ListResponse:   new(convertors.ListResponseConvertor),
+					CreateRequest:  new(convertors.CreateRequestConvertor),
+					LoginRequest:   new(convertors.UserLoginRequestConvertor),
+					LoginResponse:  new(convertors.UserLoginResponseConvertor),
+					SearchResponse: new(convertors.SearchResponseConvertor),
 				},
 			}
 
@@ -51,6 +52,7 @@ var PortsServices = []di.Def{
 			//pg.RegisterNewsServer(s.Server, NewsServer{})
 			gproto.RegisterNewsServer(s.Server, s)
 			gproto.RegisterUsersServer(s.Server, s)
+			gproto.RegisterSearchServer(s.Server, s)
 			//pg.RegisterPromosServer(server, pg.UnimplementedPromosServer{})
 
 			return s, nil

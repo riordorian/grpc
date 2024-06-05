@@ -46,5 +46,15 @@ func InitConfig() interfaces.ConfigProviderInterface {
 	)
 	viper.Set("MINIO_HOST", minioUrl)
 
+	if appEnv == "local" {
+		viper.Set("ELASTIC_HOST", "localhost")
+		viper.Set("ELASTIC_PORT", "9200")
+	}
+
+	elasticHost := viper.GetString("ELASTIC_HOST")
+	elasticPort := viper.GetString("ELASTIC_PORT")
+	elasticDsn := fmt.Sprintf("http://%s:%s", elasticHost, elasticPort)
+	viper.Set("ELASTIC_DSN", elasticDsn)
+
 	return viper
 }
