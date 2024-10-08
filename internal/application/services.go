@@ -3,6 +3,7 @@ package application
 import (
 	appnewscommands "grpc/internal/application/news/commands"
 	appnews "grpc/internal/application/news/queries"
+	appsearch "grpc/internal/application/search/queries"
 	"grpc/internal/application/storage"
 	appusers "grpc/internal/application/users/queries"
 	"grpc/internal/domain/repository"
@@ -26,6 +27,7 @@ type Handlers struct {
 
 type Queries struct {
 	GetList appnews.GetListHandlerInterface
+	Search  appsearch.SearchHandlerInterface
 	Login   appusers.LoginHandlerInterface
 }
 

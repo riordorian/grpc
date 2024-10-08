@@ -1,4 +1,4 @@
-package convertors
+package users
 
 import (
 	"grpc/internal/infrastructure/adapters/auth"

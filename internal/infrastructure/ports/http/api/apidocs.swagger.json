@@ -12,6 +12,9 @@
       "name": "Promos"
     },
     {
+      "name": "Search"
+    },
+    {
       "name": "Users"
     }
   ],
@@ -430,6 +433,14 @@
             "type": "object",
             "$ref": "#/definitions/grpcPromo"
           }
+        }
+      }
+    },
+    "grpcSearchResponse": {
+      "type": "object",
+      "properties": {
+        "Result": {
+          "type": "string"
         }
       }
     },

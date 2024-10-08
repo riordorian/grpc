@@ -7,6 +7,7 @@ import (
 	"log"
 )
 
+func (NewsServer) mustEmbedUnimplementedNewsServer() {}
 func (s NewsServer) List(ctx context.Context, req *grpc.ListRequest) (*grpc.NewsList, error) {
 	listRequest, err := s.Convertors.ListRequest.Convert(req)
 	if err != nil {

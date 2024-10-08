@@ -5,32 +5,32 @@ import (
 	"github.com/sarulabs/di"
 	gp "google.golang.org/grpc"
 	"grpc/internal/application"
-	"grpc/internal/infrastructure/ports/grpc/convertors"
+	"grpc/internal/infrastructure/ports/grpc/convertors/news"
+	"grpc/internal/infrastructure/ports/grpc/convertors/users"
 	"grpc/pkg/proto_gen/grpc"
 	"log"
 	"net"
 )
 
 type Convertors struct {
-	ListRequest   convertors.ListRequestConvertorInterface
-	ListResponse  convertors.ListResponseConvertorInterface
-	CreateRequest convertors.CreateRequestConvertorInterface
-	LoginRequest  convertors.UserLoginRequestConvertorInterface
-	LoginResponse convertors.UserLoginResponseConvertorInterface
+	ListRequest    news.ListRequestConvertorInterface
+	ListResponse   news.ListResponseConvertorInterface
+	CreateRequest  news.CreateRequestConvertorInterface
+	LoginRequest   users.UserLoginRequestConvertorInterface
+	LoginResponse  users.UserLoginResponseConvertorInterface
+	SearchResponse news.SearchResponseConvertorInterface
 }
 
 type NewsServer struct {
 	grpc.UnimplementedNewsServer
 	grpc.UnimplementedUsersServer
+	grpc.UnimplementedSearchServer
 	Handlers   application.Handlers
 	Server     *gp.Server
 	Listener   net.Listener
 	Container  di.Container
 	Convertors Convertors
 }
-
-func (NewsServer) mustEmbedUnimplementedNewsServer()  {}
-func (NewsServer) mustEmbedUnimplementedUsersServer() {}
 
 func (s NewsServer) SetHandlers(handlers application.Handlers) {
 	s.Handlers = handlers

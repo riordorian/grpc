@@ -5,6 +5,7 @@ import (
 	"grpc/pkg/proto_gen/grpc"
 )
 
+func (NewsServer) mustEmbedUnimplementedUsersServer() {}
 func (s NewsServer) Login(ctx context.Context, req *grpc.UserLoginRequest) (*grpc.UserLoginResponse, error) {
 	loginRequest, err := s.Convertors.LoginRequest.Convert(req)
 	if err != nil {

@@ -1,0 +1,18 @@
+syntax = "proto3";
+package grpc;
+option go_package = "./grpc";
+
+message SearchRequest {
+  string Field = 1;
+  string QueryString = 2;
+}
+
+message SearchResponse {
+  string Result = 1;
+}
+
+service Search{
+  rpc SearchQuery (SearchRequest) returns (SearchResponse) {
+
+  }
+}

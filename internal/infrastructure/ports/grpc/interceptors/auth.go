@@ -97,7 +97,9 @@ func (s *serverStream) RecvMsg(m any) error {
 
 func (a AuthInterceptor) needAuth(method string) bool {
 	switch method {
-	case "/grpc.Users/Login":
+	case "/grpc.Users/Login",
+		"/grpc.Search/SearchQuery",
+		"/grpc.reflection.v1alpha.ServerReflection/ServerReflectionInfo":
 		return false
 	default:
 		return true

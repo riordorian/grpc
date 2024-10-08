@@ -9,7 +9,8 @@ import (
 	"grpc/internal/application"
 	"grpc/internal/infrastructure/ports"
 	"grpc/internal/infrastructure/ports/grpc"
-	"grpc/internal/infrastructure/ports/grpc/convertors"
+	"grpc/internal/infrastructure/ports/grpc/convertors/news"
+	"grpc/internal/infrastructure/ports/grpc/convertors/users"
 	"grpc/internal/infrastructure/ports/grpc/interceptors"
 	"grpc/internal/shared/interfaces"
 	gproto "grpc/pkg/proto_gen/grpc"
@@ -39,11 +40,12 @@ var PortsServices = []di.Def{
 				Listener: lis,
 				Handlers: ctn.Get("ApplicationHandlers").(application.Handlers),
 				Convertors: grpc.Convertors{
-					ListRequest:   new(convertors.ListRequestConvertor),
-					ListResponse:  new(convertors.ListResponseConvertor),
-					CreateRequest: new(convertors.CreateRequestConvertor),
-					LoginRequest:  new(convertors.UserLoginRequestConvertor),
-					LoginResponse: new(convertors.UserLoginResponseConvertor),
+					ListRequest:    new(news.ListRequestConvertor),
+					ListResponse:   new(news.ListResponseConvertor),
+					CreateRequest:  new(news.CreateRequestConvertor),
+					LoginRequest:   new(users.UserLoginRequestConvertor),
+					LoginResponse:  new(users.UserLoginResponseConvertor),
+					SearchResponse: new(news.SearchResponseConvertor),
 				},
 			}
 
@@ -51,6 +53,7 @@ var PortsServices = []di.Def{
 			//pg.RegisterNewsServer(s.Server, NewsServer{})
 			gproto.RegisterNewsServer(s.Server, s)
 			gproto.RegisterUsersServer(s.Server, s)
+			gproto.RegisterSearchServer(s.Server, s)
 			//pg.RegisterPromosServer(server, pg.UnimplementedPromosServer{})
 
 			return s, nil

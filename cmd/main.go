@@ -54,6 +54,7 @@ func bootstrap() di.Container {
 		len(dic.ConfigServices) +
 		len(dic.RepositoryServices) +
 		len(dic.AuthServices) +
+		len(dic.SearchServices) +
 		len(dic.ApplicationServices) +
 		len(dic.PortsServices) +
 		len(dic.FileStorage)
@@ -62,6 +63,7 @@ func bootstrap() di.Container {
 	defs = append(defs, dic.ConfigServices...)
 	defs = append(defs, dic.RepositoryServices...)
 	defs = append(defs, dic.AuthServices...)
+	defs = append(defs, dic.SearchServices...)
 	defs = append(defs, dic.ApplicationServices...)
 	defs = append(defs, dic.PortsServices...)
 	defs = append(defs, dic.FileStorage...)
