@@ -1,4 +1,4 @@
-package convertors
+package news
 
 import (
 	"grpc/internal/domain/news"

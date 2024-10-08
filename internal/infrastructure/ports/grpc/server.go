@@ -5,19 +5,20 @@ import (
 	"github.com/sarulabs/di"
 	gp "google.golang.org/grpc"
 	"grpc/internal/application"
-	"grpc/internal/infrastructure/ports/grpc/convertors"
+	"grpc/internal/infrastructure/ports/grpc/convertors/news"
+	"grpc/internal/infrastructure/ports/grpc/convertors/users"
 	"grpc/pkg/proto_gen/grpc"
 	"log"
 	"net"
 )
 
 type Convertors struct {
-	ListRequest    convertors.ListRequestConvertorInterface
-	ListResponse   convertors.ListResponseConvertorInterface
-	CreateRequest  convertors.CreateRequestConvertorInterface
-	LoginRequest   convertors.UserLoginRequestConvertorInterface
-	LoginResponse  convertors.UserLoginResponseConvertorInterface
-	SearchResponse convertors.SearchResponseConvertorInterface
+	ListRequest    news.ListRequestConvertorInterface
+	ListResponse   news.ListResponseConvertorInterface
+	CreateRequest  news.CreateRequestConvertorInterface
+	LoginRequest   users.UserLoginRequestConvertorInterface
+	LoginResponse  users.UserLoginResponseConvertorInterface
+	SearchResponse news.SearchResponseConvertorInterface
 }
 
 type NewsServer struct {

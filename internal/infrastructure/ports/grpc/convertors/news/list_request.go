@@ -1,4 +1,4 @@
-package convertors
+package news
 
 import (
 	"github.com/google/uuid"
@@ -25,7 +25,6 @@ func (l ListRequestConvertor) Convert(req *pg.ListRequest) (dto.ListRequest, err
 	}
 
 	listRequest := dto.ListRequest{
-		// TODO: Is it correct way?
 		Sort:   req.Sort.String(),
 		Status: dto.Status(req.Status.Number()),
 		Query:  *req.Query,

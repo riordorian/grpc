@@ -1,4 +1,4 @@
-package convertors
+package users
 
 import (
 	"github.com/golang-jwt/jwt"
