@@ -14,8 +14,8 @@ message User {
 }
 
 message UserLoginRequest {
-  string Login = 1;
-  string Password = 2;
+  string Login = 1; // @gotags: convertable:"true"
+  string Password = 2; // @gotags: convertable:"true"
 }
 
 message UserLoginResponse {

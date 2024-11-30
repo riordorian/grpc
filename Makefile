@@ -2,7 +2,7 @@ include .env
 
 .SILENT:
 
-build:
+convert_proto:
 	protoc --proto_path=./pkg/proto \
  		--go_out=./pkg/proto_gen/ \
  		--go-grpc_out=./pkg/proto_gen/ \
@@ -11,7 +11,8 @@ build:
  		--openapiv2_opt ignore_comments=true \
  		--openapiv2_opt allow_merge=true \
  		--openapiv2_opt generate_unbound_methods=false \
- 		./pkg/proto/*.proto
+ 		./pkg/proto/*.proto && \
+ 	cd pkg/proto_gen/grpc && protoc-go-inject-tag -input="*.pb.go"
 
 build_frontend:
 		mkdir -p ./frontend/src/proto

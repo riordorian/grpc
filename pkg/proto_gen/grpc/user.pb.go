@@ -81,8 +81,8 @@ type UserLoginRequest struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Login    string `protobuf:"bytes,1,opt,name=Login,proto3" json:"Login,omitempty"`
-	Password string `protobuf:"bytes,2,opt,name=Password,proto3" json:"Password,omitempty"`
+	Login    string `protobuf:"bytes,1,opt,name=Login,proto3" json:"Login,omitempty" convertable:"true"`       // @gotags: convertable:"true"
+	Password string `protobuf:"bytes,2,opt,name=Password,proto3" json:"Password,omitempty" convertable:"true"` // @gotags: convertable:"true"
 }
 
 func (x *UserLoginRequest) Reset() {

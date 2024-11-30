@@ -5,6 +5,8 @@ import "google/api/annotations.proto";
 //import "google/protobuf/empty.proto";
 import "uuid.proto";
 import "media.proto";
+import "google/protobuf/descriptor.proto";
+
 
 package grpc;
 
@@ -25,7 +27,7 @@ message Media {
   repeated MediaItem Media = 1;
 }
 
-message New {
+message New  {
   UUID Id = 1;
   string Title= 2;
   string Text = 3;
@@ -46,11 +48,11 @@ message ListStatusFilter {
 }
 
 message ListRequest {
-  optional Sort Sort = 1;
-  optional UUID Author = 2;
-  optional Status Status = 3;
-  optional string Query = 4;
-  optional int32 Page = 5;
+  optional Sort Sort = 1; // @gotags: convertable:"true"
+  optional UUID Author = 2; // @gotags: convertable:"true"
+  optional Status Status = 3; // @gotags: convertable:"true"
+  optional string Query = 4; // @gotags: convertable:"true"
+  optional int32 Page = 5; // @gotags: convertable:"true"
 }
 
 // TODO: How to use uuid?
@@ -60,10 +62,10 @@ message InfoRequest {
 }
 
 message CreateRequest {
-  string Title = 1;
-  string Text = 2;
-  repeated string Tags = 5;
-  repeated MediaUploadRequest Media = 6;
+  string Title = 1; //@gotags: convertable:"true"
+  string Text = 2; // @gotags: convertable:"true"
+  repeated string Tags = 5; // @gotags: convertable:"true"
+  repeated MediaUploadRequest Media = 6;// @gotags: convertable:"true"
 }
 
 message CreateResponse {

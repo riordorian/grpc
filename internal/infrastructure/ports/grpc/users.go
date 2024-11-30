@@ -2,25 +2,24 @@ package grpc
 
 import (
 	"context"
+	"grpc/internal/shared/dto"
 	"grpc/pkg/proto_gen/grpc"
+	pg "grpc/pkg/proto_gen/grpc"
 )
 
 func (NewsServer) mustEmbedUnimplementedUsersServer() {}
+
 func (s NewsServer) Login(ctx context.Context, req *grpc.UserLoginRequest) (*grpc.UserLoginResponse, error) {
-	loginRequest, err := s.Convertors.LoginRequest.Convert(req)
+	requestDto := new(dto.LoginRequest)
+	_, err := s.Convertors.Request.Convert(req, requestDto)
 	if err != nil {
 		return nil, err
 	}
 
-	token, err := s.Handlers.Queries.Login.Handle(ctx, loginRequest)
+	token, err := s.Handlers.Queries.Login.Handle(ctx, *requestDto)
 	if err != nil {
 		return nil, err
 	}
-	rawToken, err := s.Convertors.LoginResponse.Convert(token)
-	if err != nil {
-		return nil, err
 
-	}
-
-	return rawToken, nil
+	return &pg.UserLoginResponse{Token: token.Raw}, nil
 }

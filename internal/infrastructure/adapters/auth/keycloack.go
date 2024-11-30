@@ -32,13 +32,6 @@ type errorResponse struct {
 	Message string `json:"message"`
 }
 
-type LoginRequest struct {
-	Login     string `json:"login"`
-	Password  string `json:"password"`
-	GrantType string `json:"grant_type"`
-	ClientId  string `json:"client_id"`
-}
-
 func (k Keycloak) Login(ctx context.Context, login string, password string) (jwt.Token, error) {
 	if "" == k.RS256 || "" == k.Secret {
 		return jwt.Token{}, errors.New("keycloak: rs256 key and secret are required")

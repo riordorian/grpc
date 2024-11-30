@@ -9,8 +9,7 @@ import (
 	"grpc/internal/application"
 	"grpc/internal/infrastructure/ports"
 	"grpc/internal/infrastructure/ports/grpc"
-	"grpc/internal/infrastructure/ports/grpc/convertors/news"
-	"grpc/internal/infrastructure/ports/grpc/convertors/users"
+	"grpc/internal/infrastructure/ports/grpc/convertors"
 	"grpc/internal/infrastructure/ports/grpc/interceptors"
 	"grpc/internal/shared/interfaces"
 	gproto "grpc/pkg/proto_gen/grpc"
@@ -40,12 +39,13 @@ var PortsServices = []di.Def{
 				Listener: lis,
 				Handlers: ctn.Get("ApplicationHandlers").(application.Handlers),
 				Convertors: grpc.Convertors{
-					ListRequest:    new(news.ListRequestConvertor),
-					ListResponse:   new(news.ListResponseConvertor),
-					CreateRequest:  new(news.CreateRequestConvertor),
-					LoginRequest:   new(users.UserLoginRequestConvertor),
-					LoginResponse:  new(users.UserLoginResponseConvertor),
-					SearchResponse: new(news.SearchResponseConvertor),
+					//ListRequest:    new(news.ListRequestConvertor),
+					//ListResponse:   new(news.ListResponseConvertor),
+					//CreateRequest:  new(news.CreateRequestConvertor),
+					//LoginRequest:   new(users.UserLoginRequestConvertor),
+					//LoginResponse:  new(users.UserLoginResponseConvertor),
+					//SearchResponse: new(news.SearchResponseConvertor),
+					Request: new(convertors.RequestConvertor),
 				},
 			}
 

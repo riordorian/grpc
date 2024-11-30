@@ -5,12 +5,10 @@ import (
 	"grpc/pkg/proto_gen/grpc"
 )
 
-type Status int
-
 type ListRequest struct {
 	Sort   string
 	Author uuid.UUID
-	Status Status
+	Status int32
 	Query  string
 	Page   int32
 }

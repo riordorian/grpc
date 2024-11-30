@@ -15,8 +15,6 @@ type NewsRepository struct {
 	Db *db.Db
 }
 
-// TODO: Is it correct to use structure from Domain layer
-
 func (r NewsRepository) GetList(ctx context.Context, req dto.ListRequest) ([]news.News, error) {
 	var result []news.News
 
